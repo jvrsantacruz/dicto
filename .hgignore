@@ -1,0 +1,17 @@
+syntax: glob
+
+*.pyc
+*.rej
+*.orig
+*.s[vw][a-z]
+*.egg-info
+docs/build
+*.log
+.tox
+dist/
+build/
+.ropeproject
+coverage.xml
+nosetests.xml
+.noseids
+coverage/*
