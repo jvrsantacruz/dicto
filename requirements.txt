@@ -1,0 +1,7 @@
+PyChef
+PyYAML
+requests
+python-redmine
+python-hglib
+Jinja2
+click

@@ -1,0 +1,7 @@
+click==4.0
+Jinja2==2.7.3
+PyChef==0.2.3
+python-hglib===unknown
+python-redmine==1.1.2
+PyYAML==3.11
+requests==2.7.0
