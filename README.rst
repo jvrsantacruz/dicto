@@ -16,7 +16,7 @@ notification generation.
   templates, and extra remote resources remote resources as *plugins*.
 * Offering a very straight-forward command line interface for humans.
 
-.. code:: shell
+::
 
     dicto view --profile duataric_email
 
@@ -38,7 +38,7 @@ Use case of generating a changelog using info from Redmine:
 1. Define a template using available Redmine info along with some basic template
 vars (*current_date*) and some user defined ones (*codename*):
 
-.. code:: rst
+::
 
     (./changelog.tpl.rst)
 
@@ -62,7 +62,7 @@ vars (*current_date*) and some user defined ones (*codename*):
 
 2. Generate the result, accessing Redmine using user credentials:
 
-.. code:: shell
+::
 
     dicto view --redmine\
                  --redmine-url http://redmine.taric.local\
@@ -99,7 +99,7 @@ under the ``default`` key will be used as command line arguments.
 This configuration file would allow to run the changelog example without
 arguments:
 
-.. code:: yaml
+::
 
     default:
         redmine: true
@@ -117,7 +117,7 @@ Profiles
 Profiles are named groups of options that can be reused. They can be defined
 as groups of key, value options under a name within the ``profiles`` section.
 
-.. code:: yaml
+::
 
     profiles:
         email:
@@ -129,7 +129,7 @@ They can be referenced and applied from the command line using the
 ``--profile NAME`` option.
 
 
-.. code:: shell
+::
 
     dicto view --profile email
 
@@ -139,7 +139,7 @@ Default locations
 
 The configuration can be specified to dicto from the command line:
 
-.. code:: shell
+::
 
     dicto --config /pat/to/cfg.yaml view (..)
 
@@ -280,7 +280,7 @@ the template. ``--data`` will add the literal value as given in the command
 line. ``--file`` will read the given *path* and put its contents in the
 variable.  In case of reusing a *key*, ``--data`` prevails over ``--file``.
 
-.. code:: shell
+::
 
     dicto view --data author:jsl \
                --data env:production \
@@ -297,7 +297,7 @@ Usage
 
 Base command:
 
-.. code::
+::
 
     Usage: dicto [OPTIONS] COMMAND [ARGS]...
 
@@ -310,9 +310,11 @@ Base command:
     Commands:
     view
 
-View command:
+View command: 
 
-Usage: dicto view [OPTIONS]
+::
+
+    Usage: dicto view [OPTIONS]
 
     Options:
     --chef / --no-chef        enable/disable chef resource (default: false)
@@ -333,6 +335,8 @@ Usage: dicto view [OPTIONS]
     --template PATH           Path to a Jinja2 template.
     --profile TEXT            Name of an existing profile in config to load
                                 options from.
+    --file TEXT               Extra data from a text file in key:path format.
+                                Reads the whole file. Can be used multiple times
     --help                    Show this message and exit.
 
 
@@ -341,7 +345,7 @@ Installation
 
 Install dependencies within a virtualenv and then the application itself.
 
-.. code:: shell
+::
 
     virtualenv env
     source env/activate
@@ -349,6 +353,6 @@ Install dependencies within a virtualenv and then the application itself.
 
 Or from our *pypiserver*:
 
-.. code:: shell
+::
 
     $ pip install dicto
