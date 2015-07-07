@@ -223,7 +223,7 @@ The following variables are available to use within the template:
 Datatypes:
 
 * ``tag``: namedtuple ``(name, rev, node, islocal)``
-* ``commit``: namedtuple ``rev, node, tags (space delimited), branch, author, desc``
+* ``commit``: namedtuple ``rev, node, tags (space delimited), branch, author, desc, datetime``
 
 See also:
 
@@ -241,8 +241,35 @@ The following variables are available to use within the template:
 
 Datatypes:
 
-* ``Environment``: 
+* ``Environment``: `See `environment object
+  <http://pychef.readthedocs.org/en/latest/api.html#environments>`_ in the
+  chef plugin documentation. Each env has a ``name`` attribute, ``attributes`` dict, ``override_attributes`` dict.
+* ``Node``: `See `node object
+  <http://pychef.readthedocs.org/en/latest/api.html#nodes>`_ in the chef
+  plugin documentation. Each node has ``name``, ``chef_environment``,
+  ``run_list`` and ``attributes``, ``override`` dict, ``default`` dict,
+  ``automatic`` dict.
 
+See also:
+
+* `PyChef <http://pychef.readthedocs.org/en/latest>`_ documentation.
+* `Chef REST Api <https://docs.chef.io/api_chef_server.html>`_ documentation.
+
+Apt
+~~~
+
+Fetches package names and urls from an aptitude repository for some packages.
+The following variables are available to use within the template:
+
+* ``apt_packages``: dict by name of of dicts with data for each package.
+
+Datatypes:
+
+* ``apt_packages``: Each dict contains ``name``, ``url`` and a ``versions``
+  list. The ``versions`` list contains dicts with ``name``, ``url``, ``date``
+  and ``size``
+
+The *version* list of available packages is version sorted asc.
 
 Usage
 -----

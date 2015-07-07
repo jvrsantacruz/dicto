@@ -5,3 +5,4 @@ python-redmine
 python-hglib
 Jinja2
 click
+natsort

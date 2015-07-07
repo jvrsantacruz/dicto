@@ -1,14 +1,16 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import re
 import os
+import io
+import re
 import ssl
 import shutil
 import urllib2
 import inspect
 import tempfile
 import datetime
+import functools
 import contextlib
 import collections
 
@@ -17,6 +19,7 @@ import yaml
 import click
 import hglib
 import jinja2
+import natsort
 import redmine
 import requests
 
@@ -37,7 +40,19 @@ def _parse_option_config(ctx, param, value):
     return value
 
 
+def manage_errors(function):
+    @functools.wraps(function)
+    def decorator(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except Exception as e:
+            error(unicode(e))
+
+    return decorator
+
+
 @click.group()
+@manage_errors
 @click.pass_context
 @click.version_option()
 @click.option('-v', '--verbose', count=True,
@@ -72,6 +87,7 @@ def _parse_option_apt_packages(ctx, param, value):
 
 
 @cli.command()
+@manage_errors
 @click.pass_obj
 @click.option('--chef/--no-chef', is_flag=True, default=None,
               help="enable/disable chef resource (default: false)")
@@ -190,8 +206,12 @@ def get_profile(config, profile_name):
 
 
 def read_config(path):
-    with click.open_file(path, 'r', encoding='utf-8') as stream:
-        return yaml.load(stream)
+    context = dict(
+        config=path,
+        config_dir=os.path.dirname(path)
+    )
+
+    return yaml.load(render_template(path, context))
 
 
 def prompt_for_missing_values(kwargs, required=None):
@@ -262,12 +282,8 @@ def render_template(path, context):
 
 
 def make_template(path):
-    """Gets and compiles a jinja2 template"""
-    path = os.path.abspath(path)
-    loader = jinja2.FileSystemLoader('/', encoding='utf-8')
-    env = jinja2.Environment(loader=loader)
-    template = env.get_template(path)
-    return template
+    with io.open(os.path.abspath(path), 'r', encoding='utf-8') as stream:
+        return jinja2.Template(stream.read())
 
 
 def get_hg_data(hg_config):
@@ -280,25 +296,40 @@ hg_tag = collections.namedtuple('Tag', ['name', 'rev', 'node', 'islocal'])
 
 
 @contextlib.contextmanager
+def hg_tmp_clone(hg_repo):
+    """Clone repository in a temporary path"""
+    try:
+        hg_tmp_path = ''
+        hg_repo_path = hg_repo
+
+        # clone remote repositories into a temporal directory
+        if hg_repo.startswith('http') or hg_repo.startswith('ssh'):
+            hg_tmp_path = hg_repo_path = tempfile.mkdtemp(prefix='dicto-hg')
+            try:
+                hglib.clone(hg_repo, hg_repo_path)
+            except hglib.error.ServerError as e:
+                error('hg: could not clone {} into {}: {}'
+                      .format(hg_repo, hg_tmp_path, unicode(e)))
+
+        yield hg_repo_path
+    finally:
+        # remove temporal path if created
+        if os.path.isdir(hg_tmp_path):
+            shutil.rmtree(hg_tmp_path)
+
+
+@contextlib.contextmanager
 def hg_open_or_clone_repo(hg_repo):
     """Open local repo. Clone when non local path is given"""
-    try:
-        hg_repo_path = hg_repo
-        if hg_repo.startswith('http') or hg_repo.startswith('ssh'):
-            hg_repo_path = tempfile.mkdtemp(prefix='dicto-hg')
-            hglib.clone(hg_repo, hg_repo_path)
-
-        yield hglib.open(hg_repo_path)
-
-    except hglib.error.ServerError as e:
-        error('hg: {} could not open {}'.format(e, hg_repo))
-
-    finally:
-        if os.path.exists(hg_repo_path):
-            shutil.rmtree(hg_repo_path)
+    with hg_tmp_clone(hg_repo) as hg_repo_path:
+        try:
+            yield hglib.open(hg_repo_path)
+        except hglib.error.ServerError as e:
+            error('hg: {} could not open {}'.format(e, hg_repo))
 
 
 def hg_version_objects(repo, tags, hg_repo, hg_version):
+    """Gets objects related to tag as a 'version'"""
     version_tag = first(t for t in tags if t.name == hg_version)
     if version_tag is None:
         error('hg: No tag named "{}" in {}'.format(hg_version, hg_repo))
@@ -334,7 +365,7 @@ def fetch_hg_data(hg_repo, hg_version):
     with hg_open_or_clone_repo(hg_repo) as repo:
         version_tag = None
         version_commits = []
-        commits = repo.log(nomerges=True)
+        commits = repo.log()
         tags = [hg_tag(*tag) for tag in repo.tags()]
 
         if hg_version:
@@ -409,23 +440,24 @@ apt_regex = re.compile(r'''
 
 def fetch_apt_package(apt_url, name):
     url = urljoin(apt_url, 'pool', 'main', name[0], name)
-    package = dict(name=name, url=url, versions=[])
-
-    for name, date, size in apt_regex.findall(requests.get(url).content):
-        package['versions'].append(
-            dict(name=name, date=date, size=size, url=urljoin(url, name)))
-
+    package = dict(name=name, url=url)
+    package['versions'] = natsort.natsorted(
+        (dict(name=name, date=date, size=size, url=urljoin(url, name))
+         for name, date, size in apt_regex.findall(requests.get(url).content)),
+        key=lambda v: v['name'])
     return package
 
 
 def fetch_apt_data(apt_url, apt_packages):
     """Return a dict with apt repo resources
 
-      apt_packages: list of `dict` with apt packages for given package names.
-       dict has `name`, `url` and `versions`. The `versions` entry is a list
-       of dict with `name`, `url`, `date`, `size`
+      apt_packages: dict of `dict` with apt packages by name for given
+       packages.  dict has `name`, `url` and `versions`. The `versions` entry
+       is a list of dict with `name`, `url`, `date`, `size`
+
+    Package names are naturally sorted.
     """
-    apt_packages = [fetch_apt_package(apt_url, name) for name in apt_packages]
+    apt_packages = {name: fetch_apt_package(apt_url, name) for name in apt_packages}
     return dict(apt_packages=apt_packages)
 
 
