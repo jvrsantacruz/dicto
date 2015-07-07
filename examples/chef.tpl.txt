@@ -1,0 +1,16 @@
+{%- for name, env in chef_envs.items() %}
+  {%- if 'production' in name %}
+Environment
+name: {{name}}
+app: tnote ({{env.override_attributes['tnote']['package']['tnote']['version']}})
+
+nodes:
+
+    {%- for node in chef_nodes.values() %}
+      {%- if node.chef_environment == env.name and 'role[tnote-admin]' in node.run_list %}
+  {{node.name.ljust(40)}} {{node.automatic.ipaddress.ljust(16)}} uptime {{node.automatic.uptime.ljust(30)}}
+
+      {%- endif -%}
+    {% endfor -%}
+  {% endif %}
+{% endfor %}

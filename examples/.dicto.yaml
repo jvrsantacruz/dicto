@@ -1,0 +1,38 @@
+default:
+  redmine_user: jsl
+  redmine_project: duataric
+  redmine_url: http://redmine.taric.local
+
+  hg_repo: ssh://hg@repositorios.taric.local/tariczilla
+  hg_version: '3.5.13'
+
+  data:
+    project: duasql
+
+profiles:
+  email:
+    redmine: true
+    redmine_project: tariczilla
+    template: {{config_dir}}/email.tpl.md
+
+  changelog:
+    template: {{config_dir}}/changelog.tpl.rst
+    redmine: true
+    data:
+      trackers:
+        errores: error
+        tareas: feature
+
+  hg:
+    template: {{config_dir}}/hg.tpl.txt
+    hg: true
+  chef:
+    template: {{config_dir}}/chef.tpl.txt
+    chef: true
+  apt:
+    template: {{config_dir}}/apt.tpl.txt
+    apt: true
+    apt_url: http://apt.taric.local
+    apt_packages:
+      - tnote
+      - caronte

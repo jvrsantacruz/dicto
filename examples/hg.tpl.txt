@@ -1,0 +1,12 @@
+Last 10 commits in {{hg_repo_path}}:
+{% for commit in hg_commits[:10] %}
+{{commit.tags.ljust(10)}}  {{commit.rev}} {{commit.node}}  {{commit.author}} 
+{{" ".ljust(10)}}  {{commit.desc.decode('utf-8')}}
+{% endfor %}
+
+Last version: {{hg_version}} ({{hg_version_tag.rev}})
+Commits in version:
+{% for commit in hg_version_commits %}
+{{commit.tags.ljust(10)}}  {{commit.rev}} {{commit.node}}  {{commit.author}} 
+{{" ".ljust(10)}}  {{commit.desc.decode('utf-8')}}
+{% endfor %}
