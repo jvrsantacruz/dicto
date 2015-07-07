@@ -271,6 +271,27 @@ Datatypes:
 
 The *version* list of available packages is version sorted asc.
 
+Other resources
+~~~~~~~~~~~~~~~
+
+The user can add extra data using the ``--data key:value`` and ``--file
+key:path`` options. Using those options, one or many variables can be set in
+the template. ``--data`` will add the literal value as given in the command
+line. ``--file`` will read the given *path* and put its contents in the
+variable.  In case of reusing a *key*, ``--data`` prevails over ``--file``.
+
+.. code:: shell
+
+    dicto view --data author:jsl \
+               --data env:production \
+               --file version:version.txt \
+               --template mytemplate.tpl.txt
+
+The previous command would add the ``author``, ``env`` and ``version`` to
+``mytemplate.tpl.txt`` rendering context and so they can be used within the
+template.
+
+
 Usage
 -----
 

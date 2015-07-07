@@ -71,13 +71,28 @@ def cli(ctx, verbose, config):
     echo(ctx.obj, 'Configuration:\n {!r}'.format(ctx.obj['config']), level='debug')
 
 
-def _parse_option_data(ctx, param, value):
-    value = [] if value is None else value
+def _parse_option_list(value):
+    return dict(entry.split(':', 1) for entry in value or [])
 
+
+def _parse_option_data(ctx, param, value):
     try:
-        return dict(entry.split(':', 1) for entry in value)
+        return _parse_option_list(value)
     except ValueError:
-        raise click.BadParameter(u'--data Option must keep a key:value format')
+        raise Error(u'--data Option must keep a key:value format')
+
+
+def _parse_option_file(ctx, param, value):
+    try:
+        value = _parse_option_list(value)
+        # open and read all files
+        for name in value:
+            path = os.path.abspath(value[name])
+            with io.open(path, encoding='utf-8') as stream:
+                value[name] = stream.read().strip()
+        return value
+    except ValueError:
+        raise Error(u'--file Option must keep a key:path format')
 
 
 def _parse_option_apt_packages(ctx, param, value):
@@ -121,6 +136,9 @@ def _parse_option_apt_packages(ctx, param, value):
               envvar='DICTO_TEMPLATE', help="Path to a Jinja2 template.")
 @click.option('--profile', envvar='DICTO_PROFILE',
               help="Name of an existing profile in config to load options from.")
+@click.option('--file', multiple=True, callback=_parse_option_file,
+              help="Extra data from a text file in key:path format. "
+              "Reads the whole file. Can be used multiple times")
 def view(obj, **kwargs):
     kwargs = resolve_args(obj['config'], kwargs)
 
@@ -136,6 +154,7 @@ def make_context(kwargs):
     """Builds template context from all data resources"""
     context = dict(current_date=datetime.datetime.now())
     context.update(kwargs)
+    context.update(kwargs['file'])
     context.update(kwargs['data'])
 
     if kwargs.get('redmine'):
