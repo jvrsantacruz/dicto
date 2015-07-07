@@ -16,6 +16,15 @@ notification generation.
   templates, and extra remote resources remote resources as *plugins*.
 * Offering a very straight-forward command line interface for humans.
 
+
+Commands
+--------
+
+dicto view
+~~~~~~~~~~
+
+*dicto view* renders a template to the standard output.
+
 ::
 
     dicto view --profile duataric_email
@@ -88,6 +97,46 @@ vars (*current_date*) and some user defined ones (*codename*):
             :tickets: 15432
 
             Mensaje de discrepancia para duas edi export y Transito
+
+Dicto shell
+~~~~~~~~~~~
+
+*dicto shell* fetches all context data needed for template rendering and opens
+a interactive shell having those variables available for direct use,
+exploration and experimentation.
+
+::
+
+    dicto shell --profile dua
+    Enter redmine password:
+    Enter redmine version: v10.17.1
+      __/   .  __  -/- _,_
+    _(_/(__/__(_,__/__(_/
+
+    Template rendering interactive context.
+
+    Available vars:
+     profile, apt_url, template, redmine_project, redmine_user, redmine_issues,
+     current_date, redmine, redmine_url, file, apt_packages, redmine_api, data,
+     redmine_version
+
+    In [1]: redmine_version.
+    redmine_version.container_all     redmine_version.post_create       redmine_version.redmine_version
+    redmine_version.container_create  redmine_version.post_update       redmine_version.refresh
+    redmine_version.container_filter  redmine_version.pre_create        redmine_version.requirements
+    redmine_version.container_one     redmine_version.pre_update        redmine_version.save
+    redmine_version.container_update  redmine_version.project           redmine_version.sharing
+    redmine_version.created_on        redmine_version.query_all         redmine_version.status
+    redmine_version.description       redmine_version.query_create      redmine_version.translate_params
+    redmine_version.id                redmine_version.query_delete      redmine_version.updated_on
+    redmine_version.internal_id       redmine_version.query_filter      redmine_version.url
+    redmine_version.is_new            redmine_version.query_one
+    redmine_version.name              redmine_version.query_update
+
+
+If available, the ``ipython`` package will be used, for a much nicer
+experience over the standard python shell. To install ``ipython`` use: ``pip
+install ipython``.
 
 Configuration
 -------------

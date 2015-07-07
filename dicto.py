@@ -101,44 +101,56 @@ def _parse_option_apt_packages(ctx, param, value):
     return value
 
 
+def common_data_options(function):
+
+    options = [
+        click.option('--chef/--no-chef', is_flag=True, default=None,
+                     help="enable/disable chef resource (default: false)"),
+        click.option('--apt/--no-apt', is_flag=True, default=None,
+                     help="enable/disable apt resource (default: false)"),
+        click.option('--apt-url', envvar='APT_URL',
+                     help="apt repository base url envvar: APT_URL"),
+        click.option('--apt-packages', multiple=True, callback=_parse_option_apt_packages,
+                     help="apt packages to include."),
+        click.option('--hg/--no-hg', is_flag=True, default=None,
+                     help="enable/disable mercurial resource (default: false)"),
+        click.option('--hg-repo', envvar='HG_REPO',
+                     help="mercurial repository PATH/URL envvar: HG_REPO"),
+        click.option('--hg-version', envvar='HG_VERSION',
+                     help="mercurial add tag to the data evvar: HG_VERSION"),
+        click.option('--redmine/--no-redmine', is_flag=True, default=None,
+                     help="enable/disable redmine resource (default: false)"),
+        click.option('--redmine-url', envvar='REDMINE_URL',
+                     help="redmine application base url envvar: REDMINE_URL"),
+        click.option('--redmine-user', envvar='REDMINE_USER',
+                     help="redmine username envvar: REDMINE_USER"),
+        click.option('--redmine-project', envvar='REDMINE_PROJECT',
+                     help="redmine project slug evvar: REDMINE_PROJECT"),
+        click.option('--redmine-version', envvar='REDMINE_VERSION',
+                     help="redmine project version envvar: REDMINE_VERSION"),
+        click.option('--redmine-password', envvar='REDMINE_PASSWORD',
+                     help="redmine user's password envvar: REDMINE_PASSWORD"),
+        click.option('--data', callback=_parse_option_data, multiple=True,
+                     help="Extra data in key:value format. Can be used multiple times."),
+        click.option('--template', type=click.Path(exists=True, dir_okay=False, resolve_path=True),
+                     envvar='DICTO_TEMPLATE', help="Path to a Jinja2 template."),
+        click.option('--profile', envvar='DICTO_PROFILE',
+                     help="Name of an existing profile in config to load options from."),
+        click.option('--file', multiple=True, callback=_parse_option_file,
+                     help="Extra data from a text file in key:path format. "
+                     "Reads the whole file. Can be used multiple times")
+    ]
+
+    for option in options:
+        function = option(function)
+
+    return function
+
+
 @cli.command()
 @manage_errors
 @click.pass_obj
-@click.option('--chef/--no-chef', is_flag=True, default=None,
-              help="enable/disable chef resource (default: false)")
-@click.option('--apt/--no-apt', is_flag=True, default=None,
-              help="enable/disable apt resource (default: false)")
-@click.option('--apt-url', envvar='APT_URL',
-              help="apt repository base url envvar: APT_URL")
-@click.option('--apt-packages', multiple=True, callback=_parse_option_apt_packages,
-              help="apt packages to include.")
-@click.option('--hg/--no-hg', is_flag=True, default=None,
-              help="enable/disable mercurial resource (default: false)")
-@click.option('--hg-repo', envvar='HG_REPO',
-              help="mercurial repository PATH/URL envvar: HG_REPO")
-@click.option('--hg-version', envvar='HG_VERSION',
-              help="mercurial add tag to the data evvar: HG_VERSION")
-@click.option('--redmine/--no-redmine', is_flag=True, default=None,
-              help="enable/disable redmine resource (default: false)")
-@click.option('--redmine-url', envvar='REDMINE_URL',
-              help="redmine application base url envvar: REDMINE_URL")
-@click.option('--redmine-user', envvar='REDMINE_USER',
-              help="redmine username envvar: REDMINE_USER")
-@click.option('--redmine-project', envvar='REDMINE_PROJECT',
-              help="redmine project slug evvar: REDMINE_PROJECT")
-@click.option('--redmine-version', envvar='REDMINE_VERSION',
-              help="redmine project version envvar: REDMINE_VERSION")
-@click.option('--redmine-password', envvar='REDMINE_PASSWORD',
-              help="redmine user's password envvar: REDMINE_PASSWORD")
-@click.option('--data', callback=_parse_option_data, multiple=True,
-              help="Extra data in key:value format. Can be used multiple times.")
-@click.option('--template', type=click.Path(exists=True, dir_okay=False, resolve_path=True),
-              envvar='DICTO_TEMPLATE', help="Path to a Jinja2 template.")
-@click.option('--profile', envvar='DICTO_PROFILE',
-              help="Name of an existing profile in config to load options from.")
-@click.option('--file', multiple=True, callback=_parse_option_file,
-              help="Extra data from a text file in key:path format. "
-              "Reads the whole file. Can be used multiple times")
+@common_data_options
 def view(obj, **kwargs):
     kwargs = resolve_args(obj['config'], kwargs)
 
@@ -148,6 +160,16 @@ def view(obj, **kwargs):
 
     template = kwargs.get('template') or error('No template given')
     click.echo(render_template(template, context))
+
+
+@cli.command()
+@manage_errors
+@click.pass_obj
+@common_data_options
+def shell(obj, **kwargs):
+    kwargs = resolve_args(obj['config'], kwargs)
+    context = make_context(kwargs)
+    make_shell(obj, context)
 
 
 def make_context(kwargs):
@@ -478,6 +500,30 @@ def fetch_apt_data(apt_url, apt_packages):
     """
     apt_packages = {name: fetch_apt_package(apt_url, name) for name in apt_packages}
     return dict(apt_packages=apt_packages)
+
+
+def make_shell(obj, context):
+    banner = """\
+  __/   .  __  -/- _,_
+_(_/(__/__(_,__/__(_/
+
+Template rendering interactive context.
+
+Available vars:
+  {}
+""".format(', '.join(context.keys()))
+
+    try:
+        from IPython import embed
+        embed(banner1=banner, user_ns=context)
+    except ImportError:
+        import code
+        import readline  # noqa
+
+        print(banner)
+        echo(obj, "Could not load ipython", level='verbose', intend='warning')
+        shell = code.InteractiveConsole(context)
+        shell.interact()
 
 
 class Error(click.ClickException):
