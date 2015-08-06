@@ -12,7 +12,7 @@ notification generation.
 * *Configurable* through `yaml <http://www.yaml.org>`_ files,
   defining a *profile* based system, allowing for multiple complex
   configurations to be easily used, shared and extended.
-* Simple to *extend* adding custom `Jinja2 <http://jinja.pocoo.org>`
+* Simple to *extend* adding custom `Jinja2 <http://jinja.pocoo.org>`_
   templates, and extra remote resources remote resources as *plugins*.
 * Offering a very straight-forward command line interface for humans.
 
@@ -23,7 +23,7 @@ Commands
 dicto view
 ~~~~~~~~~~
 
-*dicto view* renders a template to the standard output.
+*dicto view* renders templates to the standard output using external data:
 
 ::
 
@@ -42,7 +42,8 @@ dicto view
 
     * **Errores** ([#15432](http://http://redmine.taric.local/issues/15432)) Mensaje de discrepancia para duas edi export y Transito
 
-Use case of generating a changelog using info from Redmine:
+The next example will show a use case for generating a changelog using external
+info from a Redmine resource:
 
 1. Define a template using available Redmine info along with some basic template
 vars (*current_date*) and some user defined ones (*codename*):
@@ -213,10 +214,11 @@ Overriding arguments:
 ~~~~~~~~~~~~~~~~~~~~~
 
 Command line arguments might be set in the ``default`` section of the
-``config.yaml`` file, the ``profile`` section of the same file, can define the
-option again and override it, the program will take that value unless is
-defined in an environment variable, which goes first, the but it can be later
-specified again at the command line, which takes precedence over all the rest.
+``config.yaml`` file; the ``profile`` section of the same file, can define the
+option again and override it. The program will take the value from the config
+file unless it gets defined first in an environment variable. The user can
+always override all of the previous values by setting the option in the
+command line, which takes precedence over all the rest.
 
 All the different ways of defining the same option, more important first:
 
@@ -228,9 +230,9 @@ All the different ways of defining the same option, more important first:
 Resources
 ---------
 
-The tool comes with several default data resources. Each of them tries to
-obtain certain information from a resource and make it available from the user
-defined templates.
+The tool bundles in several default data resources. Each of them tries to
+obtain as much information as possible from a resource and make it available
+in the context of user defined templates.
 
 Redmine
 ~~~~~~~
@@ -316,18 +318,19 @@ Datatypes:
 
 * ``apt_packages``: Each dict contains ``name``, ``url`` and a ``versions``
   list. The ``versions`` list contains dicts with ``name``, ``url``, ``date``
-  and ``size``
-
-The *version* list of available packages is version sorted asc.
+  and ``size`` sorted by version (*name*).
 
 Other resources
 ~~~~~~~~~~~~~~~
 
 The user can add extra data using the ``--data key:value`` and ``--file
 key:path`` options. Using those options, one or many variables can be set in
-the template. ``--data`` will add the literal value as given in the command
-line. ``--file`` will read the given *path* and put its contents in the
-variable.  In case of reusing a *key*, ``--data`` prevails over ``--file``.
+the template context. ``--data`` will add the literal value as given in the
+command line. ``--file`` will open the given *path* read a file and put its
+contents in the variable.  In case of reusing a *key*, ``--data`` prevails
+over ``--file``.
+
+eg:
 
 ::
 
@@ -339,6 +342,14 @@ variable.  In case of reusing a *key*, ``--data`` prevails over ``--file``.
 The previous command would add the ``author``, ``env`` and ``version`` to
 ``mytemplate.tpl.txt`` rendering context and so they can be used within the
 template.
+
+Templates
+---------
+
+All output can be personalized by the user using custom `Jinja2
+<http://jinja.pocoo.org>`_ template files. See the `template designer
+documentation <http://jinja.pocoo.org/docs/dev/templates/>`_ for more
+information about the available syntax and functions.
 
 
 Usage
@@ -359,11 +370,9 @@ Base command:
     Commands:
     view
 
-View command: 
+Common options for ``view`` and ``shell``:
 
 ::
-
-    Usage: dicto view [OPTIONS]
 
     Options:
     --chef / --no-chef        enable/disable chef resource (default: false)

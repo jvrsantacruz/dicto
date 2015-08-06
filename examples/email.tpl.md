@@ -12,5 +12,5 @@ Hemos cerrado en pruebas {{project}} {{redmine_version.name}}
 
 Los cambios incluyen:
 {% for issue in redmine_issues %}
-* **{{issue.tracker.name}}** ([#{{issue.id}}](http://{{redmine_url}}/issues/{{issue.id}})) {{issue.subject}}
+* **{{issue.tracker.name}}** ([#{{issue.id}}]({{issue.url}})) {{issue.subject}}
 {% endfor %}
