@@ -151,7 +151,13 @@ def common_data_options(function):
 @manage_errors
 @click.pass_obj
 @common_data_options
-def view(obj, **kwargs):
+@click.option('-o', '--output', type=click.File(mode='w', encoding='utf-8'),
+              help="Writes output to file")
+@click.option('-a', '--append', type=click.File(mode='a', encoding='utf-8'),
+              help="Appends output to file")
+@click.option('-p', '--prepend', type=click.File(mode='r+', encoding='utf-8'),
+              help="Prepends output to existing file")
+def view(obj, output, append, prepend, **kwargs):
     kwargs = resolve_args(obj['config'], kwargs)
 
     echo(obj, 'Connecting to remote resources', level='verbose')
@@ -159,7 +165,8 @@ def view(obj, **kwargs):
     echo(obj, 'Render context:\n {!r}'.format(context), level='debug')
 
     template = kwargs.get('template') or error('No template given')
-    click.echo(render_template(template, context))
+
+    write_output(render_template(template, context), output, append, prepend)
 
 
 @cli.command()
@@ -313,6 +320,31 @@ def fetch_redmine_data(redmine_url, redmine_user, redmine_password, redmine_proj
         redmine_project=project,
         redmine_version=version
     )
+
+
+def write_output(content, output=None, append=None, prepend=None):
+    """Writes content to stdout or a file optionally appending/prepending
+
+    Writes a separation endline between content and previous file contents.
+    Only one file (output, append, prepend) can be given at a time.
+
+    :param content: Unicode to write to the output
+    :param output: Open file for writing.
+    :param append: Open file for appending.
+    :param prepend: Open file for reading and writing.
+    """
+    file = output or append or prepend
+
+    # Append to current file
+    if append:
+        content = u'\n' + content
+
+    # Prepend to current file
+    if prepend:
+        content += u'\n' + file.read()  # read current file contents
+        file.seek(0)                    # write again from the beginning
+
+    click.echo(content, file=file, nl=not file)
 
 
 def render_template(path, context):
