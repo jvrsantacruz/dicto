@@ -9,6 +9,7 @@ import inspect
 import tempfile
 import datetime
 import functools
+import subprocess
 import contextlib
 import collections
 try:
@@ -89,7 +90,7 @@ def _parse_option_data(ctx, param, value):
     try:
         return _parse_option_list(value)
     except ValueError:
-        raise Error(u'--data Option must keep a key:value format')
+        raise click.BadParameter(u'Option must keep a key:value format')
 
 
 def _parse_option_file(ctx, param, value):
@@ -102,7 +103,7 @@ def _parse_option_file(ctx, param, value):
                 value[name] = stream.read().strip()
         return value
     except ValueError:
-        raise Error(u'--file Option must keep a key:path format')
+        raise click.BadParameter(u'Option must keep a key:path format')
 
 
 def _parse_option_apt_packages(ctx, param, value):
@@ -142,6 +143,9 @@ def common_data_options(function):
                      help="redmine user's password envvar: REDMINE_PASSWORD"),
         click.option(u'--data', callback=_parse_option_data, multiple=True,
                      help="Extra data in key:value format. Can be used multiple times."),
+        click.option(u'--exe', multiple=True, callback=_parse_option_data,
+                     help=(u'Extra data from external program output. '
+                           u'key:command format. Can be used multiple times')),
         click.option(u'--template', type=click.Path(exists=True, dir_okay=False, resolve_path=True),
                      envvar='DICTO_TEMPLATE', help="Path to a Jinja2 template."),
         click.option(u'--profile', envvar='DICTO_PROFILE',
@@ -170,7 +174,7 @@ def common_data_options(function):
 def view(obj, output, append, prepend, **kwargs):
     kwargs = resolve_args(obj['config'], kwargs)
 
-    echo(obj, u'Connecting to remote resources', level='verbose')
+    echo(obj, u'Obtaining external data', level='verbose')
     context = make_context(kwargs)
     echo(obj, u'Render context:\n {!r}'.format(context), level='debug')
 
@@ -195,6 +199,7 @@ def make_context(kwargs):
     context.update(kwargs)
     context.update(kwargs['file'])
     context.update(kwargs['data'])
+    context.update(_get_exe_output(kwargs['exe']))
 
     if kwargs.get(u'redmine'):
         context.update(get_redmine_data(only_args_with(u'redmine_', kwargs)))
@@ -586,6 +591,17 @@ def echo(obj, message, level='normal', intend='info'):
 
 def get_function_args(callable):
     return inspect.getargspec(callable).args
+
+
+def command_output(cmd):
+    try:
+        return subprocess.Popen(cmd.split(u' '), stdout=subprocess.PIPE).stdout.read()
+    except Exception as error:
+        click.secho(u'Failed to execute "{}": {}' .format(cmd, six.text_type(error)))
+
+
+def _get_exe_output(exes):
+    return {name: command_output(cmd) for name, cmd in exes.items()}
 
 
 def first(collection):
