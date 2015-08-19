@@ -1,3 +1,10 @@
+0.3.0 (2015-08-19)
+------------------
+
+* Fixes config file loading to allow empty config files
+* Adds --exe option which gets external program output
+* Adds default config location at $(pwd)/.dicto/config.yaml
+
 0.2.1 (2015-08-19)
 ------------------
 
