@@ -1,8 +1,9 @@
-click==4.0
-Jinja2==2.7.3
+click==5.1
+Jinja2==2.8
 natsort==4.0.3
 PyChef==0.2.3
-python-hglib===unknown
-python-redmine==1.1.2
+python-hglib==1.7
+python-redmine==1.2.0
 PyYAML==3.11
 requests==2.7.0
+six==1.9.0
