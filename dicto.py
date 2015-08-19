@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import io
@@ -24,8 +23,8 @@ import redmine
 import requests
 
 DEFAULT_CONFIG_PATHS = [
-    os.path.join(os.getcwd(), '.dicto.yaml'),
-    os.path.join(click.get_app_dir('dicto', force_posix=True), 'config.yaml')
+    os.path.join(os.getcwd(), u'.dicto.yaml'),
+    os.path.join(click.get_app_dir(u'dicto', force_posix=True), u'config.yaml')
 ]
 
 
@@ -55,24 +54,24 @@ def manage_errors(function):
 @manage_errors
 @click.pass_context
 @click.version_option()
-@click.option('-v', '--verbose', count=True,
+@click.option(u'-v', u'--verbose', count=True,
               help="Level of verbosity", show_default=True)
-@click.option('--config', callback=_parse_option_config, envvar='DICTO_CONFIG',
+@click.option(u'--config', callback=_parse_option_config, envvar='DICTO_CONFIG',
               type=click.Path(exists=True, dir_okay=False, resolve_path=True),
               help='Path to the config.yaml file envvar: DICTO_CONFIG')
 def cli(ctx, verbose, config):
     ctx.obj = {}
 
     ctx.obj['verbose'] = max(0, min(2, verbose))
-    echo(ctx.obj, 'Reading config file from: {}'.format(config), level='verbose')
+    echo(ctx.obj, u'Reading config file from: {}'.format(config), level='verbose')
 
     ctx.obj['config_path'] = config
     ctx.obj['config'] = read_config(config) if config else {}
-    echo(ctx.obj, 'Configuration:\n {!r}'.format(ctx.obj['config']), level='debug')
+    echo(ctx.obj, u'Configuration:\n {!r}'.format(ctx.obj['config']), level='debug')
 
 
 def _parse_option_list(value):
-    return dict(entry.split(':', 1) for entry in value or [])
+    return dict(entry.split(u':', 1) for entry in value or [])
 
 
 def _parse_option_data(ctx, param, value):
@@ -104,39 +103,39 @@ def _parse_option_apt_packages(ctx, param, value):
 def common_data_options(function):
 
     options = [
-        click.option('--chef/--no-chef', is_flag=True, default=None,
+        click.option(u'--chef/--no-chef', is_flag=True, default=None,
                      help="enable/disable chef resource (default: false)"),
-        click.option('--apt/--no-apt', is_flag=True, default=None,
+        click.option(u'--apt/--no-apt', is_flag=True, default=None,
                      help="enable/disable apt resource (default: false)"),
-        click.option('--apt-url', envvar='APT_URL',
+        click.option(u'--apt-url', envvar='APT_URL',
                      help="apt repository base url envvar: APT_URL"),
-        click.option('--apt-packages', multiple=True, callback=_parse_option_apt_packages,
+        click.option(u'--apt-packages', multiple=True, callback=_parse_option_apt_packages,
                      help="apt packages to include."),
-        click.option('--hg/--no-hg', is_flag=True, default=None,
+        click.option(u'--hg/--no-hg', is_flag=True, default=None,
                      help="enable/disable mercurial resource (default: false)"),
-        click.option('--hg-repo', envvar='HG_REPO',
+        click.option(u'--hg-repo', envvar='HG_REPO',
                      help="mercurial repository PATH/URL envvar: HG_REPO"),
-        click.option('--hg-version', envvar='HG_VERSION',
+        click.option(u'--hg-version', envvar='HG_VERSION',
                      help="mercurial add tag to the data evvar: HG_VERSION"),
-        click.option('--redmine/--no-redmine', is_flag=True, default=None,
+        click.option(u'--redmine/--no-redmine', is_flag=True, default=None,
                      help="enable/disable redmine resource (default: false)"),
-        click.option('--redmine-url', envvar='REDMINE_URL',
+        click.option(u'--redmine-url', envvar='REDMINE_URL',
                      help="redmine application base url envvar: REDMINE_URL"),
-        click.option('--redmine-user', envvar='REDMINE_USER',
+        click.option(u'--redmine-user', envvar='REDMINE_USER',
                      help="redmine username envvar: REDMINE_USER"),
-        click.option('--redmine-project', envvar='REDMINE_PROJECT',
+        click.option(u'--redmine-project', envvar='REDMINE_PROJECT',
                      help="redmine project slug evvar: REDMINE_PROJECT"),
-        click.option('--redmine-version', envvar='REDMINE_VERSION',
+        click.option(u'--redmine-version', envvar='REDMINE_VERSION',
                      help="redmine project version envvar: REDMINE_VERSION"),
-        click.option('--redmine-password', envvar='REDMINE_PASSWORD',
+        click.option(u'--redmine-password', envvar='REDMINE_PASSWORD',
                      help="redmine user's password envvar: REDMINE_PASSWORD"),
-        click.option('--data', callback=_parse_option_data, multiple=True,
+        click.option(u'--data', callback=_parse_option_data, multiple=True,
                      help="Extra data in key:value format. Can be used multiple times."),
-        click.option('--template', type=click.Path(exists=True, dir_okay=False, resolve_path=True),
+        click.option(u'--template', type=click.Path(exists=True, dir_okay=False, resolve_path=True),
                      envvar='DICTO_TEMPLATE', help="Path to a Jinja2 template."),
-        click.option('--profile', envvar='DICTO_PROFILE',
+        click.option(u'--profile', envvar='DICTO_PROFILE',
                      help="Name of an existing profile in config to load options from."),
-        click.option('--file', multiple=True, callback=_parse_option_file,
+        click.option(u'--file', multiple=True, callback=_parse_option_file,
                      help="Extra data from a text file in key:path format. "
                      "Reads the whole file. Can be used multiple times")
     ]
@@ -151,20 +150,20 @@ def common_data_options(function):
 @manage_errors
 @click.pass_obj
 @common_data_options
-@click.option('-o', '--output', type=click.File(mode='w', encoding='utf-8'),
+@click.option(u'-o', u'--output', type=click.File(mode='w', encoding='utf-8'),
               help="Writes output to file")
-@click.option('-a', '--append', type=click.File(mode='a', encoding='utf-8'),
+@click.option(u'-a', u'--append', type=click.File(mode='a', encoding='utf-8'),
               help="Appends output to file")
-@click.option('-p', '--prepend', type=click.File(mode='r+', encoding='utf-8'),
+@click.option(u'-p', u'--prepend', type=click.File(mode='r+', encoding='utf-8'),
               help="Prepends output to existing file")
 def view(obj, output, append, prepend, **kwargs):
     kwargs = resolve_args(obj['config'], kwargs)
 
-    echo(obj, 'Connecting to remote resources', level='verbose')
+    echo(obj, u'Connecting to remote resources', level='verbose')
     context = make_context(kwargs)
-    echo(obj, 'Render context:\n {!r}'.format(context), level='debug')
+    echo(obj, u'Render context:\n {!r}'.format(context), level='debug')
 
-    template = kwargs.get('template') or error('No template given')
+    template = kwargs.get(u'template') or error(u'No template given')
 
     write_output(render_template(template, context), output, append, prepend)
 
@@ -186,19 +185,19 @@ def make_context(kwargs):
     context.update(kwargs['file'])
     context.update(kwargs['data'])
 
-    if kwargs.get('redmine'):
-        context.update(get_redmine_data(only_args_with('redmine_', kwargs)))
+    if kwargs.get(u'redmine'):
+        context.update(get_redmine_data(only_args_with(u'redmine_', kwargs)))
 
-    if kwargs.get('hg'):
-        context.update(get_hg_data(only_args_with('hg_', kwargs)))
+    if kwargs.get(u'hg'):
+        context.update(get_hg_data(only_args_with(u'hg_', kwargs)))
 
-    if kwargs.get('chef'):
+    if kwargs.get(u'chef'):
         context.update(get_chef_data())
 
-    if kwargs.get('apt'):
-        context.update(get_apt_data(only_args_with('apt_', kwargs)))
+    if kwargs.get(u'apt'):
+        context.update(get_apt_data(only_args_with(u'apt_', kwargs)))
 
-    if 'redmine_password' in context:
+    if u'redmine_password' in context:
         del context['redmine_password']  # do not print this
 
     return context
@@ -207,10 +206,10 @@ def make_context(kwargs):
 def resolve_args(config, kwargs):
     """Get given argument values using preference: cli/profile/config"""
     # get arguments from config file
-    resolved_kwargs = config.get('default', {})
+    resolved_kwargs = config.get(u'default', {})
 
     # override with profile arguments if any
-    profile = get_profile(config, kwargs.get('profile'))
+    profile = get_profile(config, kwargs.get(u'profile'))
     recursively_update(resolved_kwargs, profile)
 
     # override with given cli arguments
@@ -238,17 +237,17 @@ def only_args_with(prefix, kwargs):
 
 
 def get_profile(config, profile_name):
-    profiles = config.get('profiles', {})
+    profiles = config.get(u'profiles', {})
 
     if not profile_name:
         return {}
 
     if profile_name and not profiles:
-        error('No profiles configured')
+        error(u'No profiles configured')
 
     if profile_name not in profiles:
-        error('Profile "{}" do not exists.\nShould be one of:\n {}'.format(
-            profile_name, '\n '.join(profiles.keys())))
+        error(u'Profile "{}" do not exists.\nShould be one of:\n {}'.format(
+            profile_name, u'\n '.join(profiles.keys())))
 
     return profiles[profile_name]
 
@@ -268,7 +267,7 @@ def prompt_for_missing_values(kwargs, required=None):
     for key in required:
         if kwargs.get(key) is None:
             kwargs[key] = click.prompt(
-                text='Enter ' + key.replace('_', ' '),
+                text=u'Enter ' + key.replace(u'_', u' '),
                 hide_input='password' in key
             )
 
@@ -301,11 +300,11 @@ def fetch_redmine_data(redmine_url, redmine_user, redmine_password, redmine_proj
 
     project = get_project_by_name(api, redmine_project)
     if project is None:
-        error('redmine: Project "{}" not found'.format(redmine_project))
+        error(u'redmine: Project "{}" not found'.format(redmine_project))
 
     version = get_version_by_name(project, redmine_version)
     if version is None:
-        error('redmine: Project "{}" has no version "{}"'
+        error(u'redmine: Project "{}" has no version "{}"'
               .format(redmine_project, redmine_version))
 
     issues = api.issue.filter(
@@ -351,7 +350,7 @@ def render_template(path, context):
     try:
         return make_template(path).render(context)
     except jinja2.TemplateError as e:
-        error(unicode(e) + ' in template ' + click.format_filename(path))
+        error(six.text_type(e) + u' in template ' + click.format_filename(path))
 
 
 def make_template(path):
@@ -365,24 +364,24 @@ def get_hg_data(hg_config):
     return fetch_hg_data(**hg_config)
 
 
-hg_tag = collections.namedtuple('Tag', ['name', 'rev', 'node', 'islocal'])
+hg_tag = collections.namedtuple(u'Tag', [u'name', u'rev', u'node', u'islocal'])
 
 
 @contextlib.contextmanager
 def hg_tmp_clone(hg_repo):
     """Clone repository in a temporary path"""
     try:
-        hg_tmp_path = ''
+        hg_tmp_path = u''
         hg_repo_path = hg_repo
 
         # clone remote repositories into a temporal directory
-        if hg_repo.startswith('http') or hg_repo.startswith('ssh'):
+        if hg_repo.startswith(u'http') or hg_repo.startswith(u'ssh'):
             hg_tmp_path = hg_repo_path = tempfile.mkdtemp(prefix='dicto-hg')
             try:
                 hglib.clone(hg_repo, hg_repo_path)
             except hglib.error.ServerError as e:
-                error('hg: could not clone {} into {}: {}'
-                      .format(hg_repo, hg_tmp_path, unicode(e)))
+                error(u'hg: could not clone {} into {}: {}'
+                      .format(hg_repo, hg_tmp_path, six.text_type(e)))
 
         yield hg_repo_path
     finally:
@@ -398,25 +397,25 @@ def hg_open_or_clone_repo(hg_repo):
         try:
             yield hglib.open(hg_repo_path)
         except hglib.error.ServerError as e:
-            error('hg: {} could not open {}'.format(e, hg_repo))
+            error(u'hg: {} could not open {}'.format(e, hg_repo))
 
 
 def hg_version_objects(repo, tags, hg_repo, hg_version):
     """Gets objects related to tag as a 'version'"""
     version_tag = first(t for t in tags if t.name == hg_version)
     if version_tag is None:
-        error('hg: No tag named "{}" in {}'.format(hg_version, hg_repo))
+        error(u'hg: No tag named "{}" in {}'.format(hg_version, hg_repo))
 
     try:
         prev_version_tag = tags[tags.index(version_tag) + 1]
     except IndexError:
         revspec = version_tag.name
     else:
-        revspec = version_tag.name + ':' + prev_version_tag.name
+        revspec = version_tag.name + u':' + prev_version_tag.name
 
     version_commits = repo.log(revspec)
     if not version_commits:
-        echo('hg: No commits for version {} in {}'
+        echo(u'hg: No commits for version {} in {}'
             .format(revspec, hg_repo), intend='warning')
 
     return version_tag, version_commits
@@ -433,7 +432,7 @@ def fetch_hg_data(hg_repo, hg_version):
        between *hg_version* tag and the previous one (if any).
     """
     if not hg_repo:
-        error('hg: No repository given')
+        error(u'hg: No repository given')
 
     with hg_open_or_clone_repo(hg_repo) as repo:
         version_tag = None
@@ -512,7 +511,7 @@ apt_regex = re.compile(r'''
 
 
 def fetch_apt_package(apt_url, name):
-    url = urljoin(apt_url, 'pool', 'main', name[0], name)
+    url = urljoin(apt_url, u'pool', u'main', name[0], name)
     package = dict(name=name, url=url)
     package['versions'] = natsort.natsorted(
         (dict(name=name, date=date, size=size, url=urljoin(url, name))
@@ -543,7 +542,7 @@ Template rendering interactive context.
 
 Available vars:
   {}
-""".format(', '.join(context.keys()))
+""".format(u', '.join(context.keys()))
 
     try:
         from IPython import embed
@@ -584,7 +583,7 @@ def first(collection):
 
 
 def urljoin(*fragments):
-    return '/'.join(s.strip('/') for s in fragments if s)
+    return u'/'.join(s.strip(u'/') for s in fragments if s)
 
 
 if __name__ == "__main__":
