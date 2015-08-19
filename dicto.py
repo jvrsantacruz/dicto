@@ -34,6 +34,7 @@ except (ImportError, SyntaxError) as error:
 
 DEFAULT_CONFIG_PATHS = [
     os.path.join(os.getcwd(), u'.dicto.yaml'),
+    os.path.join(os.getcwd(), u'.dicto', u'config.yaml'),
     os.path.join(click.get_app_dir(u'dicto', force_posix=True), u'config.yaml')
 ]
 
