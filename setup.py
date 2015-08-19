@@ -10,7 +10,7 @@ REQUIREMENTS = open(os.path.join(here, 'requirements.txt')).readlines()
 
 setup(
     name='dicto',
-    version='0.2.0',
+    version='0.2.1',
     description='Notification generator',
     author='Javier Santacruz',
     author_email='jsl@taric.es',

@@ -1,3 +1,12 @@
+0.2.1 (2015-08-19)
+------------------
+
+* Fixes package versions for testing
+* Adds firsts tests
+* Adds MANIFEST.in to package version files
+* Adds python3 support
+* Changes unicode_literal in favour of u'' strings
+
 0.2.0 (2015-08-06)
 ------------------
 
