@@ -222,7 +222,7 @@ def make_context(kwargs):
 def resolve_args(config, kwargs):
     """Get given argument values using preference: cli/profile/config"""
     # get arguments from config file
-    resolved_kwargs = config.get(u'default', {})
+    resolved_kwargs = config.get(u'default') or {}
 
     # override with profile arguments if any
     profile = get_profile(config, kwargs.get(u'profile'))
