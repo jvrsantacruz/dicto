@@ -5,22 +5,32 @@ import io
 import re
 import ssl
 import shutil
-import urllib2
 import inspect
 import tempfile
 import datetime
 import functools
 import contextlib
 import collections
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
 
-import chef
+import six
 import yaml
 import click
-import hglib
 import jinja2
 import natsort
-import redmine
 import requests
+
+import hglib
+import redmine
+try:
+    import chef
+except (ImportError, SyntaxError) as error:
+    click.secho(u'chef will not be available in this platform'
+                .format(six.text_type(error)), fg=u'yellow')
+
 
 DEFAULT_CONFIG_PATHS = [
     os.path.join(os.getcwd(), u'.dicto.yaml'),
@@ -45,7 +55,7 @@ def manage_errors(function):
         try:
             return function(*args, **kwargs)
         except Exception as e:
-            error(unicode(e))
+            error(six.text_type(e))
 
     return decorator
 
@@ -465,7 +475,7 @@ def chef_start_api():
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        return urllib2.urlopen(request, context=ctx).read()
+        return urlopen(request, context=ctx).read()
 
     api._request = _request
 

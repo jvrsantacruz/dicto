@@ -6,3 +6,4 @@ python-hglib
 Jinja2
 click
 natsort
+six
