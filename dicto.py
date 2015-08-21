@@ -201,6 +201,11 @@ def make_context(kwargs):
     context.update(kwargs['data'])
     context.update(_get_exe_output(kwargs['exe']))
 
+    # make all context variable available as input arguments
+    # this allows --data argument:value to be interpreted
+    # as if --argument value was set on the command line
+    update_no_override(kwargs, context)
+
     if kwargs.get(u'redmine'):
         context.update(get_redmine_data(only_args_with(u'redmine_', kwargs)))
 
@@ -217,6 +222,11 @@ def make_context(kwargs):
         del context['redmine_password']  # do not print this
 
     return context
+
+
+def update_no_override(dst, src):
+    """Sets src values in dst only if not valued in dst already"""
+    dst.update({key: value for key, value in src.items() if dst.get(key) is None})
 
 
 def resolve_args(config, kwargs):
