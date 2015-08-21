@@ -1,3 +1,9 @@
+0.4.0 (2015-08-21)
+------------------
+
+* Changes --exe to allow shell commands such as 'ls | grep name'
+* Changes arg handling to consider --data/--exe as input arguments
+
 0.3.0 (2015-08-19)
 ------------------
 
