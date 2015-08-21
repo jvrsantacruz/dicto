@@ -605,9 +605,11 @@ def get_function_args(callable):
 
 def command_output(cmd):
     try:
-        return subprocess.Popen(cmd.split(u' '), stdout=subprocess.PIPE).stdout.read()
-    except Exception as error:
-        click.secho(u'Failed to execute "{}": {}' .format(cmd, six.text_type(error)))
+        return subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as error:
+        click.secho(u'Failed to execute "{}". The program exited unexpectedly'
+                    u' with code {} and output: {}'
+                    .format(cmd, error.returncode, error.output))
 
 
 def _get_exe_output(exes):
