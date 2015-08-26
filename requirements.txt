@@ -7,3 +7,4 @@ Jinja2
 click
 natsort
 six
+GitPython

@@ -1,0 +1,14 @@
+Last 10 commits in {{git_repo_path}}:
+{% for commit in git_commits %}
+{{commit.name_rev}} {{commit.author}}
+
+    {{commit.message}}
+{% endfor %}
+
+Last version: {{git_version}} ({{git_version_tag.rev}})
+Commits in version:
+{% for commit in git_version_commits %}
+{{commit.name_rev}} {{commit.author}}
+
+    {{commit.message}}
+{% endfor %}

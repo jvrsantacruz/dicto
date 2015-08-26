@@ -24,6 +24,7 @@ import jinja2
 import natsort
 import requests
 
+import git
 import hglib
 import redmine
 try:
@@ -123,6 +124,12 @@ def common_data_options(function):
                      help="apt repository base url envvar: APT_URL"),
         click.option(u'--apt-packages', multiple=True, callback=_parse_option_apt_packages,
                      help="apt packages to include."),
+        click.option(u'--git/--no-git', is_flag=True, default=None,
+                     help="enable/disable git resource (default: false)"),
+        click.option(u'--git-repo', envvar='GIT_REPO',
+                     help="mercurial repository PATH/URL  envvar: GIT_REPO"),
+        click.option(u'--git-version', envvar='GIT_VERSION',
+                     help="Adds git tag to the data  envvar: GIT_VERSION"),
         click.option(u'--hg/--no-hg', is_flag=True, default=None,
                      help="enable/disable mercurial resource (default: false)"),
         click.option(u'--hg-repo', envvar='HG_REPO',
@@ -217,6 +224,9 @@ def make_context(kwargs):
 
     if kwargs.get(u'apt'):
         context.update(get_apt_data(only_args_with(u'apt_', kwargs)))
+
+    if kwargs.get(u'git'):
+        context.update(get_git_data(only_args_with(u'git_', kwargs)))
 
     if u'redmine_password' in context:
         del context['redmine_password']  # do not print this
@@ -557,6 +567,66 @@ def fetch_apt_data(apt_url, apt_packages):
     """
     apt_packages = {name: fetch_apt_package(apt_url, name) for name in apt_packages}
     return dict(apt_packages=apt_packages)
+
+
+def get_git_data(git_config):
+    required = get_function_args(fetch_git_data)
+    prompt_for_missing_values(git_config, required)
+    return fetch_git_data(**git_config)
+
+
+def git_version_objects(repo, tags, git_repo, git_version):
+    """Get a tag and its related commits"""
+    version_tag = first(tag for tag in tags if tag.name == git_version)
+    if version_tag is None:
+        error(u'git: No tag named "{}" in {}'.format(git_version, git_repo))
+
+    try:
+        prev_version_tag = tags[tags.index(version_tag) - 1]
+    except IndexError:
+        revspec = version_tag.name
+    else:
+        revspec = prev_version_tag.name + u'..' + version_tag.name
+
+    version_commits = repo.iter_commits(revspec)
+    if not version_commits:
+        echo(u'git: No commits for version {} in {}'
+            .format(revspec, git_repo), intend='warning')
+
+    return version_tag, version_commits
+
+
+def fetch_git_data(git_repo, git_version):
+    """Return a dict with git repo data resources
+
+      git_repo: Object for *git_repo* mercurial repository
+      git_tags: List of all tag objects in *git_repo*
+      git_commits: List of all commit objects in *git_repo*
+      git_version_tag: Tag object named *git_version*
+      git_version_commits: List of all commit objects in *git_repo*
+       between *git_version* tag and the previous one (if any).
+    """
+    if not git_repo:
+        error(u'git: No repository given')
+
+    repo = git.Repo(git_repo)
+    tags = repo.tags
+    commits = repo.iter_commits()
+
+    if not git_version:
+        version_tag, version_commits = None, None
+    else:
+        version_tag, version_commits = \
+            git_version_objects(repo, tags, git_repo, git_version)
+
+    return dict(
+        git_repo=repo,
+        git_tags=tags,
+        git_commits=commits,
+        git_repo_path=git_repo,
+        git_version_tag=version_tag,
+        git_version_commits=version_commits
+    )
 
 
 def make_shell(obj, context):

@@ -292,7 +292,7 @@ The following variables are available to use within the template:
 
 Datatypes:
 
-* ``Environment``: `See `environment object
+* ``Environment``: `See environment object
   <http://pychef.readthedocs.org/en/latest/api.html#environments>`_ in the
   chef plugin documentation. Each env has a ``name`` attribute, ``attributes`` dict, ``override_attributes`` dict.
 * ``Node``: `See `node object
@@ -319,6 +319,34 @@ Datatypes:
 * ``apt_packages``: Each dict contains ``name``, ``url`` and a ``versions``
   list. The ``versions`` list contains dicts with ``name``, ``url``, ``date``
   and ``size`` sorted by version (*name*).
+
+Git
+~~~
+
+Fetches all repository info, commits, tags and commits within a *version*.
+The following variables are available to use within the template:
+
+* ``git_repo``: api object with general git info and operations.
+* ``git_tags``: List of all tags objects in the repository.
+* ``git_commits``: List of all commits within the repository in log order.
+* ``git_version_tag``: Tag object specified in *git_version*.
+* ``git_version_commits``: List of all commits between the tag in *git_version*
+  and the previous one (if any).
+
+Datatypes:
+
+* ``tag``: See `TagReference object
+  <http://gitpython.readthedocs.org/en/stable/reference.html#module-git.refs.tag>`_
+  in the GitPython documentation. It has a ``name`` attribute.
+* ``commit``: See `Commit object
+  <http://gitpython.readthedocs.org/en/stable/reference.html#module-git.objects.commit>`_
+  in the GitPython documentation. It has ``author``, ``hexsha``, ``name_rev``,
+  ``summary`` and ``message`` attributes.
+
+See also:
+
+* `GitPython Project <https://github.com/gitpython-developers/GitPython>`_
+* `GitPython Api Reference <http://gitpython.readthedocs.org/en/stable/reference.html#module-git.objects.commit>`_
 
 Other resources
 ~~~~~~~~~~~~~~~
