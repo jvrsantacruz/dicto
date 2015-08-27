@@ -197,9 +197,38 @@ def view(obj, output, append, prepend, **kwargs):
 @click.pass_obj
 @common_data_options
 def shell(obj, **kwargs):
+    """Starts interactive python shell"""
     kwargs = resolve_args(obj['config'], kwargs)
     context = make_context(kwargs)
     make_shell(obj, context)
+
+
+@cli.command()
+@manage_errors
+@click.pass_obj
+@common_data_options
+def context(obj, **kwargs):
+    """Lists """
+    kwargs = resolve_args(obj['config'], kwargs)
+
+    # Get context data
+    context = make_context(kwargs)
+    data = context.pop('data')
+    exe = context.pop('exe')
+    file = context.pop('file')
+
+    # Print all context data
+    print_subdict(context, '', '')
+    print_subdict(data, 'data')
+    print_subdict(exe, 'exe')
+    print_subdict(file, 'file')
+
+
+def print_subdict(data, name, prefix='\t'):
+    if name:
+        click.echo(name + ':')
+    for key, value in data.items():
+        click.echo(prefix + '{}: {}'.format(key, value))
 
 
 def make_context(kwargs):
