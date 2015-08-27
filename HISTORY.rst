@@ -1,3 +1,11 @@
+0.6.0 (2015-08-27)
+------------------
+
+* Fixes git tag detection to match mercurial's behaviour
+* Fixes problem with empty configuration files
+* Adds dicto context command that prints current context to stdout
+* Fixes fixes default location issues and adds $DICTO_HOME env variable
+
 0.5.0 (2015-08-26)
 ------------------
 
