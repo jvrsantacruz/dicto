@@ -1,21 +1,23 @@
 Dicto
 *****
 
+Text template processor for message generation
 
-Integrated, configurable and extensible automated text template processor for
-notification generation.
+Renders custom templates for recurrent text generation such as emails,
+changelogs, or notifications, fetching data from several sources such as
+*git*, *chef*, *redmine*... Integrated, configurable and extensible through
+templates.
 
-* Provides access to a wide range of remote resources offering interesting
-  domain, management and infrastructure information, through *integrations*
-  with several external applications such as *redmine*, *mercurial*, *chef*,
-  *apt* or even arbitrary user-defined data.
-* *Configurable* through `yaml <http://www.yaml.org>`_ files,
-  defining a *profile* based system, allowing for multiple complex
-  configurations to be easily used, shared and extended.
-* Simple to *extend* adding custom `Jinja2 <http://jinja.pocoo.org>`_
-  templates, and extra remote resources remote resources as *plugins*.
-* Offering a very straight-forward command line interface for humans.
-
+* Usable command line interface, designed for humans.
+* Lots of remote resources offering interesting domain, management and
+  infrastructure information, through *integrations* with several external
+  applications such as *redmine*, *mercurial*, *chef*, *apt repositories*
+* Add your custom `Jinja2 <http://jinja.pocoo.org>`_ templates, and extra
+  remote resources remote resources as *plugins*.  *apt* or even arbitrary
+  user-defined data. See the examples.
+* *Configurable* through `yaml <http://www.yaml.org>`_ files, defining a
+  *profile* based system, allowing for different multiple complex
+  configurations to be easily used, reused and shared.
 
 Commands
 --------
@@ -403,26 +405,34 @@ Common options for ``view`` and ``shell``:
 ::
 
     Options:
-    --chef / --no-chef        enable/disable chef resource (default: false)
-    --apt / --no-apt          enable/disable apt resource (default: false)
-    --apt-url TEXT            apt repository base url envvar: APT_URL
-    --apt-packages TEXT       apt packages to include.
-    --hg / --no-hg            enable/disable mercurial resource (default: false)
-    --hg-repo TEXT            mercurial repository PATH/URL envvar: HG_REPO
-    --hg-version TEXT         mercurial add tag to the data evvar: HG_VERSION
-    --redmine / --no-redmine  enable/disable redmine resource (default: false)
-    --redmine-url TEXT        redmine application base url envvar: REDMINE_URL
-    --redmine-user TEXT       redmine username envvar: REDMINE_USER
-    --redmine-project TEXT    redmine project slug evvar: REDMINE_PROJECT
-    --redmine-version TEXT    redmine project version envvar: REDMINE_VERSION
-    --redmine-password TEXT   redmine user's password envvar: REDMINE_PASSWORD
-    --data TEXT               Extra data in key:value format. Can be used
-                                multiple times.
-    --template PATH           Path to a Jinja2 template.
-    --profile TEXT            Name of an existing profile in config to load
-                                options from.
     --file TEXT               Extra data from a text file in key:path format.
                                 Reads the whole file. Can be used multiple times
+    --profile TEXT            Name of an existing profile in config to load
+                                options from.
+    --template PATH           Path to a Jinja2 template.
+    --exe TEXT                Extra data from external program output.
+                                key:command format. Can be used multiple times
+    --data TEXT               Extra data in key:value format. Can be used
+                                multiple times.
+    --redmine-password TEXT   redmine user's password envvar: REDMINE_PASSWORD
+    --redmine-version TEXT    redmine project version envvar: REDMINE_VERSION
+    --redmine-project TEXT    redmine project slug evvar: REDMINE_PROJECT
+    --redmine-user TEXT       redmine username envvar: REDMINE_USER
+    --redmine-url TEXT        redmine application base url envvar: REDMINE_URL
+    --redmine / --no-redmine  enable/disable redmine resource (default: false)
+    --hg-version TEXT         mercurial add tag to the data evvar: HG_VERSION
+    --hg-repo TEXT            mercurial repository PATH/URL envvar: HG_REPO
+    --hg / --no-hg            enable/disable mercurial resource (default: false)
+    --git-version TEXT        Adds git tag to the data  envvar: GIT_VERSION
+    --git-repo TEXT           mercurial repository PATH/URL  envvar: GIT_REPO
+    --git / --no-git          enable/disable git resource (default: false)
+    --apt-packages TEXT       apt packages to include.
+    --apt-url TEXT            apt repository base url envvar: APT_URL
+    --apt / --no-apt          enable/disable apt resource (default: false)
+    --chef / --no-chef        enable/disable chef resource (default: false)
+    -o, --output FILENAME     Writes output to file
+    -a, --append FILENAME     Appends output to file
+    -p, --prepend FILENAME    Prepends output to existing file
     --help                    Show this message and exit.
 
 
