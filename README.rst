@@ -39,12 +39,12 @@ dicto view
     |-------------- | ----------------|
     | Versión       | v10.16.9  |
     | Fecha         | 2015-07-06 |
-    | Planificación | [redmine/versions/v10.16.9](http://redmine.taric.local/versions/1244) |
-    | Documentación | [docs.taric.local/docs/duasql/v10.16.9](http://docs.taric.local/docs/duasql/v10.16.9) |
+    | Planificación | [redmine/versions/v10.16.9](http://redmine/versions/1244) |
+    | Documentación | [docs/docs/duasql/v10.16.9](http://docs/docs/duasql/v10.16.9) |
 
     Los cambios incluyen:
 
-    * **Errores** ([#15432](http://http://redmine.taric.local/issues/15432)) Mensaje de discrepancia para duas edi export y Transito
+    * **Errores** ([#15432](http://http://redmine/issues/15432)) Mensaje de discrepancia para duas edi export y Transito
 
 The next example will show a use case for generating a changelog using external
 info from a Redmine resource:
@@ -79,7 +79,7 @@ vars (*current_date*) and some user defined ones (*codename*):
 ::
 
     dicto view --redmine\
-                 --redmine-url http://redmine.taric.local\
+                 --redmine-url http://redmine\
                  --redmine-version v10.16.9 \
                  --redmine-project duataric \
                  --template changelog.tpl.rst \
@@ -161,7 +161,7 @@ arguments:
     default:
         redmine: true
         redmine_user: jsl
-        redmine_url: http://redmine.taric.local
+        redmine_url: http://redmine
         redmine_version: v10.16.9
         template: changelog.tpl.rst
         data:

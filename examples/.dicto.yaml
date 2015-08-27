@@ -1,9 +1,9 @@
 default:
   redmine_user: jsl
   redmine_project: duataric
-  redmine_url: http://redmine.taric.local
+  redmine_url: http://redmine
 
-  hg_repo: ssh://hg@repositorios.taric.local/tariczilla
+  hg_repo: ssh://hg@repositorios/tariczilla
   hg_version: '3.5.13'
 
   data:
@@ -32,7 +32,7 @@ profiles:
   apt:
     template: {{config_dir}}/apt.tpl.txt
     apt: true
-    apt_url: http://apt.taric.local
+    apt_url: http://apt
     apt_packages:
       - tnote
       - caronte
