@@ -610,19 +610,34 @@ def git_version_objects(repo, tags, git_repo, git_version):
     """Get a tag and its related commits"""
     version_tag = first(tag for tag in tags if tag.name == git_version)
     if version_tag is None:
-        error(u'git: No tag named "{}" in {}'.format(git_version, git_repo))
+        version_tag = repo.refs[0]  # master
+        click.secho(u'git: No tag named "{}" in "{}" Will use "{}"'
+            .format(git_version, git_repo, version_tag.name), fg='yellow')
 
     try:
         prev_version_tag = tags[tags.index(version_tag) - 1]
-    except IndexError:
-        revspec = version_tag.name
-    else:
-        revspec = prev_version_tag.name + u'..' + version_tag.name
+    except (IndexError, ValueError):
+        if repo.tags:
+            # if version_tag is a ref and not a tag, previous tag cannot be
+            # calculated and more recent tag is selected as previous version
+            revspec = repo.tags[-1].name + '..' + version_tag.name
+        else:
+            # up to the end of the repo
+            revspec = version_tag.name
 
-    version_commits = repo.iter_commits(revspec)
+    else:
+        # from given tag to the previous one
+        revspec = prev_version_tag.name + '..' + version_tag.name
+
+    # TODO: make it appear only on verbose
+    click.secho(u'git: Will get version commits for revs {}'.format(revspec))
+
+    # Get commits within revision but the last one, because
+    # it will belong to the previous version.
+    version_commits = list(repo.iter_commits(revspec))[:-1]
     if not version_commits:
-        echo(u'git: No commits for version {} in {}'
-            .format(revspec, git_repo), intend='warning')
+        click.secho(u'git: No commits for version {} in {}'
+                   .format(revspec, git_repo), fg='yellow')
 
     return version_tag, version_commits
 
