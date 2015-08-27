@@ -34,17 +34,19 @@ except (ImportError, SyntaxError) as error:
                 .format(six.text_type(error)), fg=u'yellow')
 
 
-DEFAULT_CONFIG_PATHS = [
-    os.path.join(os.getcwd(), u'.dicto.yaml'),
-    os.path.join(os.getcwd(), u'.dicto', u'config.yaml'),
-    os.path.join(click.get_app_dir(u'dicto', force_posix=True), u'config.yaml')
-]
+def get_default_config_paths():
+    HOME = os.getenv('DICTO_HOME', click.get_app_dir(u'dicto', force_posix=True))
+    return [
+        os.path.join(os.getcwd(), u'.dicto.yaml'),             # local config
+        os.path.join(os.getcwd(), u'.dicto', u'config.yaml'),  # project config
+        os.path.join(HOME, u'config.yaml')                     # home config
+    ]
 
 
 def _parse_option_config(ctx, param, value):
     if not value:
         # search for the most specific default config file
-        for path in DEFAULT_CONFIG_PATHS:
+        for path in get_default_config_paths():
             path = os.path.abspath(path)
             if os.path.isfile(path):
                 return path
