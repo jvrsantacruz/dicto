@@ -194,7 +194,7 @@ They can be referenced and applied from the command line using the
 Default locations
 ~~~~~~~~~~~~~~~~~
 
-The configuration can be specified to dicto from the command line:
+The configuration can be specified to dicto via command line:
 
 ::
 
@@ -204,17 +204,21 @@ from an environment variable: ::
 
     export DICTO_CONFIG=/path/to/cfg.yaml
 
-or it is read from several default locations; dicto searches for a
-configuration file in the following places in order:
+from a default location. ``dicto`` will search for a configuration file in
+default paths in the following order order:
 
-* ``./.dicto.yaml``: A file named ``.dicto.yaml`` in the current
-  directory.
-* ``~/.dicto/config.yaml``: A file named ``config.yaml`` in the *dicto*
-  user directory.
-
-The ``~`` character refers to user's ``$HOME`` in Linux and Mac OS X, see the
-`possible locations <http://click.pocoo.org/4/api/#click.get_app_dir>`_ for
-Windows.
+* **local**: ``./.dicto.yaml``: Local config file. A file named
+  ``.dicto.yaml`` in the current directory.
+* **project**: ``./.dicto/config.yaml`` Project config directory. A directory
+  called ``.dicto`` in the current directory with a ``config.yaml`` file
+  inside.
+* **home**: ``~/.dicto/config.yaml``: Home config directory. A directory
+  called ``.dicto`` in the *user directory* and file named ``config.yaml``
+  inside. The *user directory* refers to the ``$HOME`` directory in Linux and
+  Mac OS X, and see the `possible locations
+  <http://click.pocoo.org/4/api/#click.get_app_dir>`_ for Windows.  It is
+  possible to override this location by setting the ``$DICTO_HOME``
+  environment variable.
 
 
 Overriding arguments:
