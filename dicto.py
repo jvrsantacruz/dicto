@@ -325,7 +325,7 @@ def read_config(path):
         config_dir=os.path.dirname(path)
     )
 
-    return yaml.load(render_template(path, context))
+    return yaml.load(render_template(path, context)) or {}
 
 
 def prompt_for_missing_values(kwargs, required=None):
@@ -678,7 +678,7 @@ Available vars:
         import code
         import readline  # noqa
 
-        print(banner)
+        click.echo(banner)
         echo(obj, "Could not load ipython", level='verbose', intend='warning')
         shell = code.InteractiveConsole(context)
         shell.interact()
