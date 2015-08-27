@@ -2,9 +2,9 @@ default:
 
 profiles:
     changelog:
-        hg: true
-        hg_version: tip
-        hg_repo: {{config_dir}}/..
+        git: true
+        git_version: master
+        git_repo: {{config_dir}}/..
         template: {{config_dir}}/templates/changelog.tpl.rst
         exe:
             version: python setup.py --version
