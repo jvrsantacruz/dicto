@@ -10,17 +10,19 @@ templates.
 
 * Usable command line interface, designed for humans.
 * Lots of remote resources offering interesting domain, management and
-  infrastructure information, through *integrations* with several external
-  applications such as *redmine*, *mercurial*, *chef*, *apt repositories*
-* Add your custom `Jinja2 <http://jinja.pocoo.org>`_ templates, and extra
-  remote resources remote resources as *plugins*.  *apt* or even arbitrary
-  user-defined data. See the examples.
+  infrastructure information, from several external applications such as *git*,
+  *redmine*, *mercurial*, *chef*, *apt repositories*, external commands...
+* Use your custom `Jinja2 <http://jinja.pocoo.org>`_ templates
 * *Configurable* through `yaml <http://www.yaml.org>`_ files, defining a
   *profile* based system, allowing for different multiple complex
   configurations to be easily used, reused and shared.
 
 Commands
 --------
+
+Dicto has two main commands: `view`, which renders a template to the standard
+output, and `shell`, which opens an interactive interpreter with the same exact
+context the template would use to render.
 
 dicto view
 ~~~~~~~~~~
@@ -107,6 +109,9 @@ Dicto shell
 *dicto shell* fetches all context data needed for template rendering and opens
 a interactive shell having those variables available for direct use,
 exploration and experimentation.
+
+It is recomendable to have `IPython <http://ipython.org/>`_ installed for an
+enhanced interpreter experience.
 
 ::
 
@@ -452,3 +457,30 @@ Or from our *pypiserver*:
 ::
 
     $ pip install dicto
+
+Tests
+-----
+
+Install tox and use it to run the tests in all environments.
+
+::
+    pip install tox
+    tox
+
+More tests are to be added to the existing ones.
+
+
+Collaborate
+-----------
+
+Open a github issue for bug reports or new ideas.
+Pull requests are more than welcome!
+
+Roadmap:
+~~~~~~~~
+
+* Plugin interface
+* Move external resources as default plugins
+* More external resources:
+    * Github issues
+    * Remote git repositories
