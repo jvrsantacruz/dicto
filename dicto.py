@@ -8,6 +8,7 @@ import shutil
 import inspect
 import tempfile
 import datetime
+import traceback
 import functools
 import subprocess
 import contextlib
@@ -60,6 +61,8 @@ def manage_errors(function):
         try:
             return function(*args, **kwargs)
         except Exception as e:
+            # TODO: Only show this on verbose mode
+            print(traceback.print_exc())
             error(six.text_type(e))
 
     return decorator
@@ -417,6 +420,8 @@ def render_template(path, context):
     try:
         return make_template(path).render(context)
     except jinja2.TemplateError as e:
+        # TODO: Only show this on verbose mode
+        print(traceback.print_exc())
         error(six.text_type(e) + u' in template ' + click.format_filename(path))
 
 
@@ -634,7 +639,7 @@ def git_version_objects(repo, tags, git_repo, git_version):
 
     # Get commits within revision but the last one, because
     # it will belong to the previous version.
-    version_commits = list(repo.iter_commits(revspec))[:-1]
+    version_commits = list(repo.iter_commits(revspec))
     if not version_commits:
         click.secho(u'git: No commits for version {} in {}'
                    .format(revspec, git_repo), fg='yellow')
