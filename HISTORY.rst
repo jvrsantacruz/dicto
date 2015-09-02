@@ -1,3 +1,13 @@
+0.7.0 (2015-09-02)
+------------------
+
+* Fixes git warning that goes 'could not use master, using master'
+* Fixes broken output of --exe strings assuming input is utf-8 text
+* Fixes error with git_version_commits
+* Fixes problem with empty configuration files
+* Adds dicto context command that prints current context to stdout
+* Adds  variable and fixes default location issues
+
 0.6.0 (2015-08-27)
 ------------------
 
