@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import logging
@@ -13,13 +12,13 @@ from dicto import cli
 from click.testing import CliRunner
 
 
-logger = logging.getLogger('tests.cli')
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.yaml')
-EXAMPLES = os.path.join(os.path.dirname(__file__), '../examples')
+logger = logging.getLogger(u'tests.cli')
+CONFIG_FILE = os.path.join(os.path.dirname(__file__), u'config.yaml')
+EXAMPLES = os.path.join(os.path.dirname(__file__), u'../examples')
 
 
 class CommandTest(object):
-    env = {'DICTO_CONFIG': CONFIG_FILE}
+    env = {u'DICTO_CONFIG': CONFIG_FILE}
 
     def setup(self):
         self.setup_runner()
@@ -41,11 +40,11 @@ class CommandTest(object):
         return self.result
 
     def assert_result(self, *matchers, **kwargs):
-        result = kwargs.get('result', self.result)
+        result = kwargs.get(u'result', self.result)
 
         assert_that(result, all_of(
-            has_property('exit_code', kwargs.pop('exit_code', 0)),
-            has_property('output', kwargs.pop('output', anything())),
+            has_property(u'exit_code', kwargs.pop(u'exit_code', 0)),
+            has_property(u'output', kwargs.pop(u'output', anything())),
             has_properties(**kwargs),
             *matchers
         ))
@@ -53,14 +52,14 @@ class CommandTest(object):
 
 class TestCommands(CommandTest):
     def test_command_list(self):
-        commands = ('shell', 'view', 'context')
-        has_commands = (has_property('name', name) for name in commands)
+        commands = (u'shell', u'view', u'context')
+        has_commands = (has_property(u'name', name) for name in commands)
         assert_that(cli.commands.values(), contains_inanyorder(*has_commands))
 
     def test_commands_help(self):
         yield self.check_command
         for command in cli.commands.values():
-            yield self.check_command, command.name, '--help'
+            yield self.check_command, command.name, u'--help'
 
     def check_command(self, *names):
         self.run(names)
@@ -75,13 +74,13 @@ class TestContextCommand(CommandTest):
 
         date_to_minutes = str(datetime.now())[:-9]
         self.assert_result(output=contains_string(
-            'current_date: ' + date_to_minutes))
+            u'current_date: ' + date_to_minutes))
 
     def test_it_outputs_data_inputs(self):
         """Reflect given extra data"""
         self.run(['context',
-                  '--data', 'key1:value1',
-                  '--data', 'key2:value2'])
+                  u'--data', u'key1:value1',
+                  u'--data', u'key2:value2'])
 
         self.assert_result(output=all_of(
             contains_string('data:\n'),
@@ -92,8 +91,8 @@ class TestContextCommand(CommandTest):
     def test_it_outputs_data_variables(self):
         """Add given data to context"""
         self.run(['context',
-                  '--data', 'key1:value1',
-                  '--data', 'key2:value2'])
+                  u'--data', u'key1:value1',
+                  u'--data', u'key2:value2'])
 
         self.assert_result(output=all_of(
             contains_string('\nkey1: value1\n'),
@@ -103,8 +102,8 @@ class TestContextCommand(CommandTest):
     def test_it_outputs_exe_inputs(self):
         """Reflect given commands"""
         self.run(['context',
-                  '--exe', 'key1:echo value1',
-                  '--exe', 'key2:echo value2'])
+                  u'--exe', u'key1:echo value1',
+                  u'--exe', u'key2:echo value2'])
 
         self.assert_result(output=all_of(
             contains_string('exe:\n'),
@@ -115,8 +114,8 @@ class TestContextCommand(CommandTest):
     def test_it_outputs_exe_variables(self):
         """Runs given commands and add outputs to context"""
         self.run(['context',
-                  '--exe', 'key1:echo value1',
-                  '--exe', 'key2:echo value2'])
+                  u'--exe', u'key1:echo value1',
+                  u'--exe', u'key2:echo value2'])
 
         self.assert_result(output=all_of(
             contains_string('\nkey1: value1'),
@@ -126,12 +125,15 @@ class TestContextCommand(CommandTest):
     def test_it_outputs_file_variables(self):
         """Runs given commands and add outputs to context"""
         with self.runner.isolated_filesystem() as path:
-            create_file(os.path.join(path, 'content1'), 'value1')
-            create_file(os.path.join(path, 'content2'), 'value2')
+            file1 = os.path.join(path, u'content1')
+            file2 = os.path.join(path, u'content2')
+
+            create_file(file1, u'value1')
+            create_file(file2, u'value2')
 
             self.run(['context',
-                      '--file', 'key1:content1',
-                      '--file', 'key2:content2'])
+                      u'--file', u'key1:' + file1,
+                      u'--file', u'key2:' + file2])
 
         self.assert_result(output=all_of(
             contains_string('\nkey1: value1'),
@@ -141,7 +143,7 @@ class TestContextCommand(CommandTest):
     def test_it_gets_profile_data(self):
         """Runs given commands and add outputs to context"""
         with self.runner.isolated_filesystem() as path:
-            make_config(path, '.dicto.yaml', contents="""
+            make_config(path, u'.dicto.yaml', contents="""
 profiles:
     profile:
         key1: value1
@@ -149,10 +151,9 @@ profiles:
             key2: value2
         exe:
             key3: echo value3
-
             """)
 
-            self.run(['context', '--profile', 'profile'])
+            self.run(['context', u'--profile', u'profile'])
 
         self.assert_result(output=all_of(
             contains_string('\nkey1: value1'),
@@ -167,7 +168,7 @@ class TestReadConfig(CommandTest):
     def test_it_works_without_config_file(self):
         self.run_with_configs(local=False, project=False, home=False)
 
-        self.assert_config('None')
+        self.assert_config(u'None')
 
     def test_it_reads_local_config_before_others(self):
         configs = self.run_with_configs(local=True, project=True, home=True)
@@ -186,26 +187,26 @@ class TestReadConfig(CommandTest):
 
     def assert_config(self, path):
         self.assert_result(output=contains_string(
-            'Reading config file from: ' + path.decode('utf-8')))
+            u'Reading config file from: ' + path))
 
     def cmd(self, home=None):
-        env = {'DICTO_HOME': home} if home else {}
-        self.run(['--verbose', 'context'], env=env)
+        env = {u'DICTO_HOME': home} if home else {}
+        self.run([u'--verbose', u'context'], env=env)
 
     def run_with_configs(self, local, project, home):
         with self.runner.isolated_filesystem() as path:
             paths = make_configs(path, local, project, home)
 
-            self.cmd(home=os.path.join(path, 'home'))
+            self.cmd(home=os.path.join(path, u'home'))
 
         return paths
 
 
 def make_configs(path, local, project, home):
     return dict(
-        local=make_config(path, '.dicto.yaml') if local else '',
-        project=make_config(path, 'config.yaml', '.dicto') if project else '',
-        home=make_config(path, 'config.yaml', 'home') if home else ''
+        local=make_config(path, u'.dicto.yaml') if local else u'',
+        project=make_config(path, u'config.yaml', u'.dicto') if project else u'',
+        home=make_config(path, u'config.yaml', u'home') if home else u''
     )
 
 
@@ -222,5 +223,5 @@ def make_config(path, file, folder=None, contents=''):
 
 
 def create_file(path, contents=''):
-    with open(path, 'w') as stream:
+    with open(path, u'w') as stream:
         stream.write(contents)

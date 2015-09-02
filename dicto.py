@@ -221,17 +221,20 @@ def context(obj, **kwargs):
     file = context.pop('file')
 
     # Print all context data
-    print_subdict(context, '', '')
+    print_subdict(context)
     print_subdict(data, 'data')
     print_subdict(exe, 'exe')
     print_subdict(file, 'file')
 
 
-def print_subdict(data, name, prefix='\t'):
+def print_subdict(data, name=None):
+    prefix = u''
     if name:
-        click.echo(name + ':')
+        prefix = u'\t'
+        click.echo(name + u':')
+
     for key, value in data.items():
-        click.echo(prefix + '{}: {}'.format(key, value))
+        click.echo(u'{}{}: {}'.format(prefix, key, value))
 
 
 def make_context(kwargs):
