@@ -1,12 +1,14 @@
 from __future__ import print_function
 
 import os
+import re
 import logging
 import traceback
 from datetime import datetime
 
 from hamcrest import (assert_that, all_of, has_property, has_properties,
-                      anything, contains_inanyorder, contains_string)
+                      anything, contains_inanyorder, contains_string,
+                      matches_regexp)
 
 from dicto import cli
 from click.testing import CliRunner
@@ -83,9 +85,9 @@ class TestContextCommand(CommandTest):
                   u'--data', u'key2:value2'])
 
         self.assert_result(output=all_of(
-            contains_string('data:\n'),
-            contains_string('\tkey1: value1\n'),
-            contains_string('\tkey2: value2\n'),
+            contains_string(u'data:\n'),
+            contains_re(r'^\tkey1: value1$'),
+            contains_re(r'^\tkey2: value2$'),
         ))
 
     def test_it_outputs_data_variables(self):
@@ -95,8 +97,8 @@ class TestContextCommand(CommandTest):
                   u'--data', u'key2:value2'])
 
         self.assert_result(output=all_of(
-            contains_string('\nkey1: value1\n'),
-            contains_string('\nkey2: value2\n'),
+            contains_re(r'^key1: value1$'),
+            contains_re(r'^key2: value2$'),
         ))
 
     def test_it_outputs_exe_inputs(self):
@@ -106,9 +108,9 @@ class TestContextCommand(CommandTest):
                   u'--exe', u'key2:echo value2'])
 
         self.assert_result(output=all_of(
-            contains_string('exe:\n'),
-            contains_string('\tkey1: echo value1\n'),
-            contains_string('\tkey2: echo value2\n'),
+            contains_string(u'exe:\n'),
+            contains_re(r'^\tkey1: echo value1$'),
+            contains_re(r'^\tkey2: echo value2$'),
         ))
 
     def test_it_outputs_exe_variables(self):
@@ -118,8 +120,8 @@ class TestContextCommand(CommandTest):
                   u'--exe', u'key2:echo value2'])
 
         self.assert_result(output=all_of(
-            contains_string('\nkey1: value1'),
-            contains_string('\nkey2: value2'),
+            contains_re(r'^key1: value1'),
+            contains_re(r'^key2: value2'),
         ))
 
     def test_it_outputs_file_variables(self):
@@ -136,8 +138,8 @@ class TestContextCommand(CommandTest):
                       u'--file', u'key2:' + file2])
 
         self.assert_result(output=all_of(
-            contains_string('\nkey1: value1'),
-            contains_string('\nkey2: value2'),
+            contains_re(r'^key1: value1'),
+            contains_re(r'^key2: value2'),
         ))
 
     def test_it_gets_profile_data(self):
@@ -156,9 +158,9 @@ profiles:
             self.run(['context', u'--profile', u'profile'])
 
         self.assert_result(output=all_of(
-            contains_string('\nkey1: value1'),
-            contains_string('\nkey2: value2'),
-            contains_string('\nkey3: value3'),
+            contains_re(r'^key1: value1'),
+            contains_re(r'^key2: value2'),
+            contains_re(r'^key3: value3'),
         ))
 
 
@@ -225,3 +227,7 @@ def make_config(path, file, folder=None, contents=''):
 def create_file(path, contents=''):
     with open(path, u'w') as stream:
         stream.write(contents)
+
+
+def contains_re(text):
+    return matches_regexp(re.compile(text, re.MULTILINE))

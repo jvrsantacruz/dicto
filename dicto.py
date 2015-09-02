@@ -211,7 +211,7 @@ def shell(obj, **kwargs):
 @click.pass_obj
 @common_data_options
 def context(obj, **kwargs):
-    """Lists """
+    """Lists available data in the context"""
     kwargs = resolve_args(obj['config'], kwargs)
 
     # Get context data
@@ -727,9 +727,17 @@ def get_function_args(callable):
     return inspect.getargspec(callable).args
 
 
+def assure_unicode(text):
+    return text.decode('utf-8') if isinstance(text, bytes) else text
+
+
 def command_output(cmd):
+    """Run external command and get the result
+
+    Supposes utf-8 encoding for the command output
+    """
     try:
-        return subprocess.check_output(cmd, shell=True)
+        return assure_unicode(subprocess.check_output(cmd, shell=True))
     except subprocess.CalledProcessError as error:
         click.secho(u'Failed to execute "{}". The program exited unexpectedly'
                     u' with code {} and output: {}'
