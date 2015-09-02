@@ -618,7 +618,7 @@ def git_version_objects(repo, tags, git_repo, git_version):
     """Get a tag and its related commits"""
     version_tag = first(tag for tag in tags if tag.name == git_version)
     if version_tag is None:
-        version_tag = repo.refs[0]  # master
+        version_tag = first(ref for ref in repo.refs if ref.name == 'master')
         click.secho(u'git: No tag named "{}" in "{}" Will use {}'
             .format(git_version, git_repo, version_tag.name), fg='yellow')
 
