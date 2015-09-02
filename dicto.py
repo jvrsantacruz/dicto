@@ -619,7 +619,7 @@ def git_version_objects(repo, tags, git_repo, git_version):
     version_tag = first(tag for tag in tags if tag.name == git_version)
     if version_tag is None:
         version_tag = repo.refs[0]  # master
-        click.secho(u'git: No tag named "{}" in "{}" Will use "{}"'
+        click.secho(u'git: No tag named "{}" in "{}" Will use {}'
             .format(git_version, git_repo, version_tag.name), fg='yellow')
 
     try:
