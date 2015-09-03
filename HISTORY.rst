@@ -1,3 +1,8 @@
+0.7.1 (2015-09-03)
+------------------
+
+* Fixes default tag for git, searches for master ref
+
 0.7.0 (2015-09-02)
 ------------------
 
