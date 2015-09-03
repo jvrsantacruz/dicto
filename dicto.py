@@ -618,7 +618,7 @@ def git_version_objects(repo, tags, git_repo, git_version):
     """Get a tag and its related commits"""
     version_tag = first(tag for tag in tags if tag.name == git_version)
     if version_tag is None:
-        version_tag = first(ref for ref in repo.refs if ref.name == 'master')
+        version_tag = first(ref for ref in repo.refs if ref.name == u'master')
         click.secho(u'git: No tag named "{}" in "{}" Will use {}'
             .format(git_version, git_repo, version_tag.name), fg='yellow')
 
@@ -628,14 +628,14 @@ def git_version_objects(repo, tags, git_repo, git_version):
         if repo.tags:
             # if version_tag is a ref and not a tag, previous tag cannot be
             # calculated and more recent tag is selected as previous version
-            revspec = repo.tags[-1].name + '..' + version_tag.name
+            revspec = repo.tags[-1].name + u'..' + version_tag.name
         else:
             # up to the end of the repo
             revspec = version_tag.name
 
     else:
         # from given tag to the previous one
-        revspec = prev_version_tag.name + '..' + version_tag.name
+        revspec = prev_version_tag.name + u'..' + version_tag.name
 
     # TODO: make it appear only on verbose
     click.secho(u'git: Will get version commits for revs {}'.format(revspec))
