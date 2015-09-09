@@ -3,6 +3,12 @@ Dicto
 
 Text template processor for message generation
 
+  dictō   Latin (verb)
+
+      1. repeat, say often.
+      2. dictate (to someone for writing).
+      3. compose, express in writing.
+
 Renders custom templates for recurrent text generation such as emails,
 changelogs, or notifications, fetching data from several sources such as
 *git*, *chef*, *redmine*... Integrated, configurable and extensible through
