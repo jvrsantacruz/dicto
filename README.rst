@@ -3,11 +3,11 @@ Dicto
 
 Text template processor for message generation
 
-  dictō   Latin (verb)
-
-      1. repeat, say often.
-      2. dictate (to someone for writing).
-      3. compose, express in writing.
+  dictō
+    Latin (verb)
+    1. repeat, say often.
+    2. dictate (to someone for writing).
+    3. compose, express in writing.
 
 Renders custom templates for recurrent text generation such as emails,
 changelogs, or notifications, fetching data from several sources such as
@@ -264,6 +264,10 @@ The following variables are available to use within the template:
 * ``redmine_issues``: List of issue objects with the list of open issues
   in the *project* at given *version*.
 
+Use ``redmine_key`` along with the Redmine user token, which can be found in
+``http://redmine/my/account`` to use the API without having to type your
+password or set it on the command line.
+
 Datatypes:
 
 * ``project``: See `project object <http://python-redmine.readthedocs.org/resources/project.html>`_ documentation.
@@ -429,6 +433,7 @@ Common options for ``view`` and ``shell``:
                                 key:command format. Can be used multiple times
     --data TEXT               Extra data in key:value format. Can be used
                                 multiple times.
+    --redmine-key TEXT        redmine user's key token envvar: REDMINE_KEY
     --redmine-password TEXT   redmine user's password envvar: REDMINE_PASSWORD
     --redmine-version TEXT    redmine project version envvar: REDMINE_VERSION
     --redmine-project TEXT    redmine project slug evvar: REDMINE_PROJECT

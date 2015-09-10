@@ -153,6 +153,8 @@ def common_data_options(function):
                      help="redmine project version envvar: REDMINE_VERSION"),
         click.option(u'--redmine-password', envvar='REDMINE_PASSWORD',
                      help="redmine user's password envvar: REDMINE_PASSWORD"),
+        click.option(u'--redmine-key', envvar='REDMINE_KEY',
+                     help="redmine user's key token envvar: REDMINE_KEY"),
         click.option(u'--data', callback=_parse_option_data, multiple=True,
                      help="Extra data in key:value format. Can be used multiple times."),
         click.option(u'--exe', multiple=True, callback=_parse_option_data,
@@ -334,20 +336,37 @@ def read_config(path):
     return yaml.load(render_template(path, context)) or {}
 
 
-def prompt_for_missing_values(kwargs, required=None):
+def prompt_for_missing_values(kwargs, required=None, mutual=None):
     required = required if required else kwargs.keys()
+    mutual = mutual if mutual else {}
 
     for key in required:
-        if kwargs.get(key) is None:
+        if should_prompt_for_value(kwargs, mutual, key):
             kwargs[key] = click.prompt(
                 text=u'Enter ' + key.replace(u'_', u' '),
                 hide_input='password' in key
             )
 
 
+def fill_optional_values(kwargs, mutual):
+    for key in mutual:
+        if kwargs.get(key) is None:
+            kwargs[key] = None
+
+
+def should_prompt_for_value(kwargs, mutual, key):
+    return kwargs.get(key) is None and kwargs.get(mutual.get(key)) is None
+
+
 def get_redmine_data(kwargs):
     required = get_function_args(fetch_redmine_data)
-    prompt_for_missing_values(kwargs, required)
+    mutual = dict(
+        redmine_user=u'redmine_key',
+        redmine_password=u'redmine_key',
+        redmine_key=u'redmine_password'
+    )
+    fill_optional_values(kwargs, mutual)
+    prompt_for_missing_values(kwargs, required, mutual)
     return fetch_redmine_data(**kwargs)
 
 
@@ -360,16 +379,27 @@ def get_version_by_name(project, version_name):
     return first(v for v in project.versions if v.name == version_name)
 
 
-def fetch_redmine_data(redmine_url, redmine_user, redmine_password, redmine_project, redmine_version):
+def fetch_redmine_data(redmine_url, redmine_project, redmine_version,
+                       redmine_user, redmine_password, redmine_key):
     """Return a dict of redmine data resources
 
-      redmine_api: Object for redmine at *redmine_url*
-      redmine_project: Object for *redmine_project* at *redmine_url*
-      redmine_version: Object for *redmine_version* at *redmine_project*
-      redmine_issues: List of objects for open issues in *redmine_project*
-       at *redmine_version*
+    :param redmine_url: Redmine access http/s url
+    :param redmine_project: Name of the Redmine project to use
+    :param redmine_version: Version to search for in the Redmine project
+    :param redmine_user: Login name for the a valid Redmine user
+    :param redmine_password: Password for ``redmine_user``
+    :param redmine_key: User's auth token (alternative to
+                        ``redmine_user`` and ``redmine_password``)
+
+    :returns: Context dict populated with the following data:
+      - redmine_api: Object for redmine at *redmine_url*
+      - redmine_project: Object for *redmine_project* at *redmine_url*
+      - redmine_version: Object for *redmine_version* at *redmine_project*
+      - redmine_issues: List of objects for open issues in *redmine_project*
+        at *redmine_version*
     """
-    api = redmine.Redmine(redmine_url, username=redmine_user, password=redmine_password)
+    api = redmine.Redmine(redmine_url, username=redmine_user,
+                          password=redmine_password, key=redmine_key)
 
     project = get_project_by_name(api, redmine_project)
     if project is None:
