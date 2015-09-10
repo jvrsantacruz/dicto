@@ -1,4 +1,4 @@
-{{version.strip()}} ({{current_date.date()}})
+{{version}} ({{current_date.date()}})
 ------------------
 
 {% for commit in git_version_commits

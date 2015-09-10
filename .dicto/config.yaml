@@ -7,4 +7,4 @@ profiles:
         git_repo: {{config_dir}}/..
         template: {{config_dir}}/templates/changelog.tpl.rst
         exe:
-            version: python setup.py --version
+            version: python setup.py --version | tr -d '\n'

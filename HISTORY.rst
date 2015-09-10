@@ -1,3 +1,8 @@
+0.8.0 (2015-09-10)
+------------------
+
+* Adds --redmine-key option for Redmine token authentication
+
 0.7.1 (2015-09-03)
 ------------------
 
