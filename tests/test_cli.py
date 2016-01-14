@@ -68,7 +68,7 @@ class TestCommands(CommandTest):
         self.assert_result()
 
 
-class TestContextCommand(CommandTest):
+class TestDefaultContext(CommandTest):
     env = {}  # clear config paths in env
 
     def test_it_outputs_current_date(self):
@@ -77,6 +77,10 @@ class TestContextCommand(CommandTest):
         date_to_minutes = str(datetime.now())[:-9]
         self.assert_result(output=contains_string(
             u'current_date: ' + date_to_minutes))
+
+
+class TestDataOption(CommandTest):
+    env = {}  # clear config paths in env
 
     def test_it_outputs_data_inputs(self):
         """Reflect given extra data"""
@@ -101,6 +105,10 @@ class TestContextCommand(CommandTest):
             contains_re(r'^key2: value2$'),
         ))
 
+
+class TestExeOption(CommandTest):
+    env = {}  # clear config paths in env
+
     def test_it_outputs_exe_inputs(self):
         """Reflect given commands"""
         self.run(['context',
@@ -124,6 +132,10 @@ class TestContextCommand(CommandTest):
             contains_re(r'^key2: value2'),
         ))
 
+
+class TestFileOption(CommandTest):
+    env = {}  # clear config paths in env
+
     def test_it_outputs_file_variables(self):
         """Runs given commands and add outputs to context"""
         with self.runner.isolated_filesystem() as path:
@@ -141,6 +153,10 @@ class TestContextCommand(CommandTest):
             contains_re(r'^key1: value1'),
             contains_re(r'^key2: value2'),
         ))
+
+
+class TestProfileOption(CommandTest):
+    env = {}  # clear config paths in env
 
     def test_it_gets_profile_data(self):
         """Runs given commands and add outputs to context"""
