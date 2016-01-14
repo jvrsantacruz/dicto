@@ -472,6 +472,10 @@ def get_hg_data(hg_config):
 hg_tag = collections.namedtuple(u'Tag', [u'name', u'rev', u'node', u'islocal'])
 
 
+def make_hg_tag(*args):
+    return hg_tag(*map(assure_unicode, args))
+
+
 @contextlib.contextmanager
 def hg_tmp_clone(hg_repo):
     """Clone repository in a temporary path"""
@@ -543,7 +547,7 @@ def fetch_hg_data(hg_repo, hg_version):
         version_tag = None
         version_commits = []
         commits = repo.log()
-        tags = [hg_tag(*tag) for tag in repo.tags()]
+        tags = [make_hg_tag(*tag) for tag in repo.tags()]
 
         if hg_version:
             version_tag, version_commits = \
