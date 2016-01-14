@@ -1,3 +1,9 @@
+0.8.1 (2016-01-14)
+------------------
+
+* Fixes testing environments
+* Fixes problem with hg tags text encoding
+
 0.8.0 (2015-09-10)
 ------------------
 
